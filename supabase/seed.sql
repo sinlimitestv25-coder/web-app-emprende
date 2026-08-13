@@ -1,0 +1,4 @@
+-- Los planes y módulos iniciales forman parte de la migración principal.
+-- El primer superadministrador se asigna después de crear su usuario en Supabase Auth:
+-- insert into public.platform_admins (user_id)
+-- select id from auth.users where email = 'TU_CORREO';

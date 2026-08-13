@@ -1,22 +1,71 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-autofocus */
 "use client";
 
-import { useState } from "react";
-import { spaces } from "../../data/demo";
+import { useMemo, useState, type FormEvent } from "react";
+import { modules, spaces as initialSpaces, type PlatformSpace, type SpaceStatus } from "../../data/demo";
+import { isSupabaseConfigured, provisionSpace } from "../../lib/supabase";
 
-export function Spaces() {
-  const [showModal, setShowModal] = useState(false);
+export function Spaces({ demoMode }: { demoMode: boolean }) {
+  const [spaces, setSpaces] = useState(initialSpaces);
+  const [showWizard, setShowWizard] = useState(false);
+  const [selected, setSelected] = useState<PlatformSpace | null>(null);
+  const [filter, setFilter] = useState("");
+  const visibleSpaces = useMemo(() => spaces.filter((space) => `${space.name} ${space.owner} ${space.id}`.toLowerCase().includes(filter.toLowerCase())), [spaces, filter]);
+
+  function updateStatus(id: string, status: SpaceStatus) {
+    setSpaces((current) => current.map((space) => space.id === id ? { ...space, status } : space));
+    setSelected((current) => current?.id === id ? { ...current, status } : current);
+  }
+
   return (
     <>
-      <div className="page-heading"><div><p className="eyebrow">Plataforma multitenant</p><h1>Espacios</h1><p>Creá y administrá cada emprendimiento desde un solo lugar.</p></div><button className="button primary" onClick={() => setShowModal(true)}>+ Nuevo espacio</button></div>
-      <div className="summary-strip"><div><span>Espacios totales</span><strong>3</strong></div><div><span>Activos</span><strong>2</strong></div><div><span>En prueba</span><strong>1</strong></div><div><span>Facturación mensual</span><strong>$ 1.968.700</strong></div></div>
+      <div className="page-heading"><div><p className="eyebrow">Gestión de la plataforma</p><h1>Espacios</h1><p>Creá y administrá emprendimientos sin entrar en su información comercial.</p></div><button className="button primary" onClick={() => setShowWizard(true)}>+ Nuevo emprendimiento</button></div>
+      <div className="summary-strip"><div><span>Espacios totales</span><strong>{spaces.length}</strong></div><div><span>Activos</span><strong>{spaces.filter((space) => space.status === "Activo").length}</strong></div><div><span>Configurando</span><strong>{spaces.filter((space) => space.status === "Configurando").length}</strong></div><div><span>Usuarios asignados</span><strong>{spaces.reduce((total, space) => total + space.users, 0)}</strong></div></div>
       <section className="panel table-panel">
-        <div className="table-tools"><div className="search-field">⌕<input aria-label="Buscar espacios" placeholder="Buscar por nombre, titular o ID" /></div><button className="select-button">Todos los estados⌄</button></div>
-        <div className="spaces-table">
-          <div className="table-head"><span>Emprendimiento</span><span>Plan</span><span>Estado</span><span>Este mes</span><span>Acciones</span></div>
-          {spaces.map((space) => <div className="table-row" key={space.id}><div className="space-name"><span className={`avatar avatar-${space.tone}`}>{space.initials}</span><div><strong>{space.name}</strong><small>{space.owner} · {space.id}</small></div></div><span className="plan-pill">{space.plan}</span><span className={`status ${space.status === "Activo" ? "success" : "neutral"}`}>{space.status}</span><div><strong>{space.sales}</strong><small>{space.orders} pedidos</small></div><button className="row-menu" aria-label={`Opciones de ${space.name}`}>•••</button></div>)}
+        <div className="table-tools"><div className="search-field">⌕<input aria-label="Buscar espacios" value={filter} onChange={(event) => setFilter(event.target.value)} placeholder="Buscar por nombre, titular o ID" /></div><button className="select-button">Todos los estados⌄</button></div>
+        <div className="spaces-table platform-spaces-table">
+          <div className="table-head"><span>Emprendimiento</span><span>Plan</span><span>Estado</span><span>Uso</span><span>Acciones</span></div>
+          {visibleSpaces.map((space) => <div className="table-row" key={space.id}><div className="space-name"><span className={`avatar avatar-${space.tone}`}>{space.initials}</span><div><strong>{space.name}</strong><small>{space.owner} · {space.id}</small></div></div><span className="plan-pill">{space.plan}</span><span className={`status ${space.status === "Activo" ? "success" : space.status === "Suspendido" ? "danger" : "neutral"}`}>{space.status}</span><div><strong>{space.storage}</strong><small>{space.users}/{space.maxUsers} usuarios · {space.portal}</small></div><button className="row-action" onClick={() => setSelected(space)}>Administrar</button></div>)}
         </div>
       </section>
-      {showModal && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowModal(false)}><div className="modal" role="dialog" aria-modal="true" aria-labelledby="new-space-title" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowModal(false)} aria-label="Cerrar">×</button><p className="eyebrow">Nuevo cliente</p><h2 id="new-space-title">Crear un espacio</h2><p>El ID y la configuración inicial se generan automáticamente.</p><label>Nombre del emprendimiento<input placeholder="Ej. Mundo Creativo" autoFocus /></label><label>Nombre de la administradora<input placeholder="Nombre y apellido" /></label><div className="form-grid"><label>Correo<input type="email" placeholder="nombre@correo.com" /></label><label>Plan<select defaultValue="Pro"><option>Esencial</option><option>Pro</option><option>Prueba</option></select></label></div><div className="module-options"><span>Módulos iniciales</span><label><input type="checkbox" defaultChecked /> Inventario</label><label><input type="checkbox" defaultChecked /> Pedidos</label><label><input type="checkbox" defaultChecked /> Portal</label><label><input type="checkbox" /> Finanzas</label></div><button className="button primary full" onClick={() => setShowModal(false)}>Crear espacio y enviar invitación</button></div></div>}
+      {showWizard && <ProvisionWizard demoMode={demoMode} nextNumber={spaces.length + 1} onClose={() => setShowWizard(false)} onCreated={(space) => { setSpaces((current) => [...current, space]); setShowWizard(false); }} />}
+      {selected && <SpaceDrawer space={selected} onClose={() => setSelected(null)} onStatus={updateStatus} />}
     </>
   );
+}
+
+function ProvisionWizard({ demoMode, nextNumber, onClose, onCreated }: { demoMode: boolean; nextNumber: number; onClose: () => void; onCreated: (space: PlatformSpace) => void }) {
+  const [step, setStep] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({ businessName: "", ownerName: "", email: "", phone: "", plan: "Base", maxUsers: "1", color: "#e7674e", selectedModules: modules.slice(0, 5) });
+
+  function toggleModule(name: string) {
+    setForm((current) => ({ ...current, selectedModules: current.selectedModules.includes(name) ? current.selectedModules.filter((item) => item !== name) : [...current.selectedModules, name] }));
+  }
+
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    try {
+      let publicId = `NX-${String(nextNumber).padStart(6, "0")}`;
+      if (!demoMode && isSupabaseConfigured) {
+        const planCode = form.plan === "Equipo" ? "team" : form.plan === "Prueba" ? "trial" : "base";
+        const result = await provisionSpace({ name: form.businessName, ownerName: form.ownerName, email: form.email, phone: form.phone, plan: planCode, maxUsers: Number(form.maxUsers), accentColor: form.color, modules: form.selectedModules });
+        publicId = result.publicId;
+      }
+      onCreated({ id: publicId, name: form.businessName, owner: form.ownerName, email: form.email, plan: form.plan as PlatformSpace["plan"], status: "Configurando", modules: form.selectedModules, users: 1, maxUsers: Number(form.maxUsers), storage: "0 MB", lastAccess: "Invitación pendiente", portal: "Borrador", initials: form.businessName.split(" ").map((word) => word[0]).join("").slice(0, 2).toUpperCase(), tone: "blue" });
+    } catch {
+      setError("No se pudo crear el espacio. Revisá la conexión y volvé a intentar.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return <div className="modal-backdrop"><form className="modal provision-modal" onSubmit={submit}><button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar">×</button><div className="wizard-progress"><span className={step >= 1 ? "active" : ""}>1</span><i/><span className={step >= 2 ? "active" : ""}>2</span><i/><span className={step >= 3 ? "active" : ""}>3</span></div>{step === 1 && <><p className="eyebrow">Paso 1 de 3</p><h2>Datos del emprendimiento</h2><p>Esta información identifica el espacio; no incluye datos comerciales.</p><label>Nombre del emprendimiento<input value={form.businessName} onChange={(event) => setForm({...form,businessName:event.target.value})} placeholder="Ej. Mundo Creativo" required autoFocus /></label><div className="form-grid"><label>Administradora principal<input value={form.ownerName} onChange={(event) => setForm({...form,ownerName:event.target.value})} placeholder="Nombre y apellido" required /></label><label>Teléfono<input value={form.phone} onChange={(event) => setForm({...form,phone:event.target.value})} placeholder="+54 9..." /></label></div><label>Correo para la invitación<input type="email" value={form.email} onChange={(event) => setForm({...form,email:event.target.value})} placeholder="nombre@correo.com" required /></label><button type="button" className="button primary full" onClick={() => setStep(2)}>Continuar</button></>}{step === 2 && <><p className="eyebrow">Paso 2 de 3</p><h2>Plan, usuarios y módulos</h2><p>Todo queda habilitado inicialmente y puede ajustarse más adelante.</p><div className="form-grid"><label>Plan<select value={form.plan} onChange={(event) => setForm({...form,plan:event.target.value})}><option>Base</option><option>Equipo</option><option>Prueba</option></select></label><label>Máximo de usuarios<select value={form.maxUsers} onChange={(event) => setForm({...form,maxUsers:event.target.value})}><option value="1">1 administrador</option><option value="3">1 admin + 2 empleados</option><option value="6">Hasta 6 usuarios</option></select></label></div><div className="module-selector"><span>Módulos habilitados</span>{modules.map((name) => <label key={name}><input type="checkbox" checked={form.selectedModules.includes(name)} onChange={() => toggleModule(name)} /><i>{form.selectedModules.includes(name) ? "✓" : ""}</i>{name}</label>)}</div><div className="wizard-buttons"><button type="button" className="button secondary" onClick={() => setStep(1)}>Atrás</button><button type="button" className="button primary" onClick={() => setStep(3)}>Continuar</button></div></>}{step === 3 && <><p className="eyebrow">Paso 3 de 3</p><h2>Identidad y confirmación</h2><p>Podrás cargar las primeras imágenes luego de crear el espacio.</p><div className="brand-setup"><div className="logo-drop"><span>{form.businessName ? form.businessName.charAt(0).toUpperCase() : "N"}</span><button type="button">Cargar logo</button></div><label>Color principal<input type="color" value={form.color} onChange={(event) => setForm({...form,color:event.target.value})} /></label></div><div className="provision-summary"><div><span>Emprendimiento</span><strong>{form.businessName || "Sin nombre"}</strong></div><div><span>Administradora</span><strong>{form.ownerName || "Sin asignar"}</strong></div><div><span>Acceso</span><strong>Invitación por correo</strong></div><div><span>Módulos</span><strong>{form.selectedModules.length} habilitados</strong></div></div>{error && <div className="auth-message">{error}</div>}<div className="wizard-buttons"><button type="button" className="button secondary" onClick={() => setStep(2)}>Atrás</button><button className="button primary" disabled={saving}>{saving ? "Creando…" : "Crear espacio e invitar"}</button></div></>}</form></div>;
+}
+
+function SpaceDrawer({ space, onClose, onStatus }: { space: PlatformSpace; onClose: () => void; onStatus: (id: string, status: SpaceStatus) => void }) {
+  return <div className="drawer-backdrop" onMouseDown={onClose}><aside className="space-drawer" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose}>×</button><div className="drawer-identity"><span className={`avatar avatar-${space.tone}`}>{space.initials}</span><div><p>{space.id}</p><h2>{space.name}</h2><span className={`status ${space.status === "Activo" ? "success" : "neutral"}`}>{space.status}</span></div></div><section><h3>Administración</h3><dl><div><dt>Responsable</dt><dd>{space.owner}</dd></div><div><dt>Correo</dt><dd>{space.email}</dd></div><div><dt>Plan</dt><dd>{space.plan}</dd></div><div><dt>Usuarios</dt><dd>{space.users} de {space.maxUsers}</dd></div><div><dt>Uso</dt><dd>{space.storage}</dd></div><div><dt>Último acceso</dt><dd>{space.lastAccess}</dd></div></dl></section><section><h3>Módulos habilitados</h3><div className="drawer-modules">{space.modules.map((name) => <span key={name}>✓ {name}</span>)}</div></section><div className="privacy-lock"><strong>Información comercial protegida</strong><p>Productos, clientes, pedidos y finanzas no están disponibles en esta vista.</p></div><div className="drawer-actions"><button className="button secondary">Restablecer acceso</button>{space.status === "Suspendido" ? <button className="button primary" onClick={() => onStatus(space.id,"Activo")}>Reactivar espacio</button> : <button className="button danger-button" onClick={() => onStatus(space.id,"Suspendido")}>Suspender espacio</button>}<button className="archive-button" onClick={() => onStatus(space.id,"Archivado")}>Archivar emprendimiento</button></div></aside></div>;
 }

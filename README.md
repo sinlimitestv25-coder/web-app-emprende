@@ -1,54 +1,49 @@
-# Nexo
+# Nexo v0.2
 
-Base v0.1 de un SaaS multitenant para la gestión de emprendimientos de productos personalizados.
+SaaS multitenant para administrar emprendimientos. Esta versión separa la superadministración de la operación privada de cada negocio.
 
-## Alcance actual
+## Incluye
 
-- dashboard general de la plataforma;
-- gestión visual de espacios o emprendimientos;
-- inventario con stock físico, reservado y disponible;
-- flujo de pedidos;
-- vista previa del portal público;
-- navegación responsive;
-- esquema inicial multitenant con usuarios, membresías, módulos, productos, clientes, pedidos, movimientos de inventario y auditoría.
+- acceso exclusivo del superadministrador;
+- modo demostración mientras se vincula el proyecto real;
+- creación guiada de emprendimientos;
+- ID público automático `NX-000001`;
+- administradores, invitaciones y recuperación de acceso;
+- planes, límites de usuarios y módulos;
+- suspensión y archivado de espacios;
+- auditoría administrativa sin contenido comercial;
+- PostgreSQL, Supabase Auth, Storage y políticas RLS;
+- funciones protegidas para aprovisionar espacios y gestionar accesos;
+- exportación estática compatible con Netlify.
 
-Los datos que aparecen en la interfaz son demostrativos. La estructura persistente está declarada en `db/schema.ts` y su primera migración en `drizzle/0000_curved_goliath.sql`.
+## Configuración
 
-## Ejecución local
+1. Crear un proyecto nuevo de Supabase para Nexo.
+2. Aplicar `supabase/migrations/20260813074000_platform_foundation.sql`.
+3. Crear el primer usuario desde Supabase Auth.
+4. Insertar su ID en `public.platform_admins` siguiendo la indicación de `supabase/seed.sql`.
+5. Desplegar las funciones `provision-tenant` y `manage-platform-user`.
+6. Configurar `SITE_URL` en los secretos de las funciones.
+7. Copiar `.env.example` a `.env.local` y completar la URL y clave publicable.
+8. Cargar esas dos variables públicas en Netlify.
 
-Requiere Node.js 22.13 o superior.
+La clave secreta o `service_role` nunca debe incluirse en Netlify ni usar el prefijo `NEXT_PUBLIC_`.
+
+## Desarrollo
 
 ```bash
 npm install
 npm run dev
 ```
 
-Para validar una entrega:
+## Verificación y publicación
 
 ```bash
-npm run build
 npm test
 ```
 
-## Publicación en Netlify
+Netlify usa automáticamente `netlify.toml`, ejecuta `npm run build` y publica `dist`.
 
-El proyecto incluye `netlify.toml`. Netlify ejecuta `npm run build` y publica `dist`. El último paso del build genera una versión estática navegable de esta v0.1; no depende de que Netlify interprete la salida interna de Cloudflare.
+## Regla de privacidad
 
-Para generar una nueva migración después de modificar el esquema:
-
-```bash
-npm run db:generate
-```
-
-## Regla multitenant
-
-Todo registro perteneciente a un emprendimiento incluye `tenant_id`. Las consultas y escrituras futuras deben recibir el espacio desde la sesión validada en el servidor y filtrar siempre por ese identificador; nunca se debe aceptar un `tenant_id` enviado libremente por el navegador.
-
-## Próximas versiones
-
-- v0.2: autenticación, invitaciones, permisos y aprovisionamiento real de espacios;
-- v0.3: CRUD de inventario, proveedores y compras;
-- v0.4: clientes, pedidos, reservas y movimientos de stock;
-- v0.5: portal público, carrito y envío de pedidos;
-- v0.6: finanzas, reportes, combos y promociones;
-- v1.0: endurecimiento de seguridad, pruebas completas y entrega productiva.
+El superadministrador puede consultar espacios, usuarios, planes, módulos, estados, consumo y auditoría. No puede consultar productos, clientes, pedidos, ventas, gastos, ganancias ni movimientos internos de un emprendimiento.

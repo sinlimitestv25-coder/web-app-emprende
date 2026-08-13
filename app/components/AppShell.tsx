@@ -1,26 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { navItems, type NavId } from "../data/demo";
-import { Dashboard } from "./modules/Dashboard";
+import { getSupabase, isSupabaseConfigured } from "../lib/supabase";
+import { LoginScreen } from "./auth/LoginScreen";
+import { PlatformDashboard } from "./modules/PlatformDashboard";
 import { Spaces } from "./modules/Spaces";
-import { Inventory } from "./modules/Inventory";
-import { Orders } from "./modules/Orders";
-import { Portal } from "./modules/Portal";
-
-const moduleCopy: Partial<Record<NavId, { eyebrow: string; title: string; text: string }>> = {
-  clientes: { eyebrow: "Relaciones", title: "Clientes", text: "Agenda, historial de compras y comunicación en un solo lugar." },
-  finanzas: { eyebrow: "Rentabilidad", title: "Finanzas", text: "Ventas, costos, gastos y ganancias reales por emprendimiento." },
-  configuracion: { eyebrow: "Plataforma", title: "Configuración", text: "Planes, permisos, módulos y reglas generales de la plataforma." },
-};
+import { Administrators } from "./modules/Administrators";
+import { Plans } from "./modules/Plans";
+import { Activity } from "./modules/Activity";
 
 export function AppShell() {
   const [active, setActive] = useState<NavId>("resumen");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [authState, setAuthState] = useState<"signed-out" | "signed-in">("signed-out");
+  const [demoMode, setDemoMode] = useState(false);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const supabase = getSupabase();
+    supabase.auth.getSession().then(({ data }) => setAuthState(data.session ? "signed-in" : "signed-out"));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthState(session ? "signed-in" : "signed-out");
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   function navigate(id: NavId) {
     setActive(id);
     setMenuOpen(false);
+  }
+
+  async function signOut() {
+    if (!demoMode && isSupabaseConfigured) await getSupabase().auth.signOut();
+    setDemoMode(false);
+    setAuthState("signed-out");
+  }
+
+  if (authState === "signed-out" && !demoMode) {
+    return <LoginScreen onDemo={() => { setDemoMode(true); setAuthState("signed-in"); }} onSignedIn={() => setAuthState("signed-in")} />;
   }
 
   return (
@@ -28,32 +48,33 @@ export function AppShell() {
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
         <button className="brand" onClick={() => navigate("resumen")} aria-label="Ir al resumen">
           <span className="brand-mark">N</span>
-          <span><strong>Nexo</strong><small>gestión modular</small></span>
+          <span><strong>Nexo</strong><small>plataforma SaaS</small></span>
         </button>
 
-        <div className="workspace-switcher">
-          <span className="avatar avatar-coral">LC</span>
-          <span><small>Espacio activo</small><strong>Luna Creativa</strong></span>
-          <span className="chevron">⌄</span>
+        <div className="platform-badge">
+          <span className="platform-badge-icon">S</span>
+          <span><small>Vista actual</small><strong>Superadministración</strong></span>
         </div>
 
         <nav aria-label="Navegación principal">
-          <p className="nav-label">Gestión</p>
+          <p className="nav-label">Plataforma</p>
           {navItems.map((item) => (
             <button key={item.id} className={active === item.id ? "nav-item active" : "nav-item"} onClick={() => navigate(item.id)}>
               <span className="nav-glyph">{item.glyph}</span>{item.label}
-              {item.id === "pedidos" && <span className="nav-count">3</span>}
+              {item.id === "administradores" && <span className="nav-count">1</span>}
             </button>
           ))}
           <p className="nav-label nav-label-system">Sistema</p>
           <button className={active === "configuracion" ? "nav-item active" : "nav-item"} onClick={() => navigate("configuracion")}>
-            <span className="nav-glyph">A</span>Configuración
+            <span className="nav-glyph">C</span>Configuración
           </button>
         </nav>
 
+        <div className="privacy-note"><span>✓</span><p><strong>Vista protegida</strong>Sin acceso a datos comerciales de los emprendimientos.</p></div>
+
         <div className="sidebar-footer">
           <div className="mini-profile"><span className="avatar avatar-dark">JM</span><span><strong>Juan Martín</strong><small>Superadministrador</small></span></div>
-          <button className="dots" aria-label="Opciones de cuenta">•••</button>
+          <button className="dots" onClick={signOut} aria-label="Cerrar sesión">Salir</button>
         </div>
       </aside>
 
@@ -62,34 +83,36 @@ export function AppShell() {
       <main className="main">
         <header className="topbar">
           <button className="menu-button" onClick={() => setMenuOpen(true)} aria-label="Abrir menú">☰</button>
-          <div className="topbar-path"><span>Plataforma</span><b>/</b><strong>{navItems.find((item) => item.id === active)?.label ?? "Configuración"}</strong></div>
+          <div className="topbar-path"><span>Superadministración</span><b>/</b><strong>{navItems.find((item) => item.id === active)?.label ?? "Configuración"}</strong></div>
           <div className="topbar-actions">
+            {demoMode && <span className="demo-chip">Modo demostración</span>}
             <button className="icon-button" aria-label="Buscar">⌕</button>
             <button className="icon-button notification" aria-label="Notificaciones">○<span /></button>
-            <button className="help-button">¿Necesitás ayuda?</button>
           </div>
         </header>
 
         <section className="content">
-          {active === "resumen" && <Dashboard onNavigate={navigate} />}
-          {active === "espacios" && <Spaces />}
-          {active === "inventario" && <Inventory />}
-          {active === "pedidos" && <Orders />}
-          {active === "portal" && <Portal />}
-          {moduleCopy[active] && <ComingSoon {...moduleCopy[active]!} />}
+          {active === "resumen" && <PlatformDashboard onNavigate={navigate} />}
+          {active === "espacios" && <Spaces demoMode={demoMode} />}
+          {active === "administradores" && <Administrators demoMode={demoMode} />}
+          {active === "planes" && <Plans />}
+          {active === "actividad" && <Activity />}
+          {active === "configuracion" && <Settings />}
         </section>
       </main>
     </div>
   );
 }
 
-function ComingSoon({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
+function Settings() {
   return (
-    <div className="coming-page">
-      <p className="eyebrow">{eyebrow}</p>
-      <h1>{title}</h1>
-      <p>{text}</p>
-      <div className="coming-card"><span>v0.2</span><strong>Módulo preparado para la siguiente etapa</strong><p>La navegación y el aislamiento por espacio ya forman parte de la base.</p></div>
-    </div>
+    <>
+      <div className="page-heading"><div><p className="eyebrow">Seguridad y plataforma</p><h1>Configuración</h1><p>Parámetros generales sin acceso a información privada de los negocios.</p></div></div>
+      <div className="settings-grid">
+        <section className="panel settings-card"><span className="settings-icon">2F</span><div><h2>Seguridad del superadministrador</h2><p>Autenticación de dos factores, duración de sesión y alertas de acceso.</p><button className="button secondary">Configurar seguridad</button></div></section>
+        <section className="panel settings-card"><span className="settings-icon">EM</span><div><h2>Correos de acceso</h2><p>Invitaciones, recuperación de contraseña y remitente de confianza.</p><button className="button secondary">Editar comunicaciones</button></div></section>
+        <section className="panel settings-card"><span className="settings-icon">AU</span><div><h2>Auditoría</h2><p>Retención de eventos administrativos y exportación de registros.</p><button className="button secondary">Ver política</button></div></section>
+      </div>
+    </>
   );
 }

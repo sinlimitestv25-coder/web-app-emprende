@@ -2,28 +2,14 @@ import vinext from "vinext";
 import { defineConfig } from "vite";
 import { sites } from "./build/sites-vite-plugin";
 
-const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
-  "00000000-0000-4000-8000-000000000000";
-
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
 const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
-  d1_databases: [
-    {
-      binding: "DB",
-      database_name: "nexo-d1",
-      database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
-    },
-  ],
-  r2_buckets: [
-    {
-      binding: "ASSETS",
-      bucket_name: "nexo-assets",
-    },
-  ],
+  d1_databases: [],
+  r2_buckets: [],
 };
 
 export default defineConfig(async () => {
