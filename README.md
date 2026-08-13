@@ -30,6 +30,10 @@ npm run build
 npm test
 ```
 
+## Publicación en Netlify
+
+El proyecto incluye `netlify.toml`. Netlify ejecuta `npm run build` y publica `dist`. El último paso del build genera una versión estática navegable de esta v0.1; no depende de que Netlify interprete la salida interna de Cloudflare.
+
 Para generar una nueva migración después de modificar el esquema:
 
 ```bash
