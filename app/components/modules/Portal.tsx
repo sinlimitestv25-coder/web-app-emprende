@@ -1,0 +1,9 @@
+const catalog = [
+  { name: "Vaso térmico personalizado", price: "$ 22.900", tag: "Más vendido", tone: "portal-product-coral" },
+  { name: "Taza con diseño a elección", price: "$ 12.300", tag: "Nuevo", tone: "portal-product-lilac" },
+  { name: "Combo mate + vaso", price: "$ 38.400", old: "$ 45.200", tag: "-15%", tone: "portal-product-mint" },
+];
+
+export function Portal() {
+  return <><div className="page-heading"><div><p className="eyebrow">Vista previa · Luna Creativa</p><h1>Portal de venta</h1><p>Lo que publiques acá se sincroniza con el inventario.</p></div><div className="heading-actions"><button className="button secondary">Personalizar</button><button className="button primary">Abrir portal ↗</button></div></div><div className="portal-browser"><div className="browser-bar"><i/><i/><i/><span>nexo.app/tienda/luna-creativa</span></div><div className="storefront"><header><div className="store-logo">Luna<span>Creativa</span></div><nav>Inicio　Productos　Combos</nav><button>Carrito <b>2</b></button></header><div className="store-hero"><div><span>HECHO ESPECIALMENTE PARA VOS</span><h2>Regalos que cuentan<br/>tu historia.</h2><p>Personalizamos cada detalle para convertir tus ideas en algo único.</p><button>Ver productos</button></div><div className="hero-object"><span>LC</span><small>creá · regalá · sorprendé</small></div></div><div className="catalog-head"><div><span>NUESTROS FAVORITOS</span><h3>Elegí, personalizá y disfrutá</h3></div><button>Ver todos →</button></div><div className="catalog-grid">{catalog.map(product=><article key={product.name}><div className={`portal-product ${product.tone}`}><span>{product.tag}</span><b>{product.name.charAt(0)}</b></div><p>{product.name}</p><div><strong>{product.price}</strong>{product.old&&<s>{product.old}</s>}<button>+</button></div></article>)}</div></div></div></>;
+}
