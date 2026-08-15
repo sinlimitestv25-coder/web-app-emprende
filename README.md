@@ -1,6 +1,6 @@
-# Nexo v0.2
+# Nexo v0.3
 
-SaaS multitenant para administrar emprendimientos. Esta versión separa la superadministración de la operación privada de cada negocio.
+SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
 ## Incluye
 
@@ -15,6 +15,19 @@ SaaS multitenant para administrar emprendimientos. Esta versión separa la super
 - PostgreSQL, Supabase Auth, Storage y políticas RLS;
 - funciones protegidas para aprovisionar espacios y gestionar accesos;
 - exportación estática compatible con Netlify.
+
+## Panel del emprendimiento v0.3
+
+- tablero con ventas, ganancia estimada, pedidos y alertas;
+- alta y edición de productos, variantes, costos, precios y stock;
+- stock mínimo y publicación u ocultamiento en el portal;
+- agenda de clientes y proveedores con acceso a WhatsApp;
+- creación y seguimiento de pedidos;
+- descuento de stock al comenzar la preparación y reintegro al cancelar;
+- edición visual del portal, catálogo y carrito con pedido por WhatsApp;
+- persistencia local de los datos de prueba y restablecimiento seguro.
+
+Desde la pantalla de acceso se puede elegir entre la demostración del emprendimiento y la superadministración. Los datos de prueba se guardan solamente en el navegador y todavía no se escriben en Supabase.
 
 ## Configuración
 

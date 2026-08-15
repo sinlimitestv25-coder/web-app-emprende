@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { getSupabase, isSupabaseConfigured, requirePlatformAdmin } from "../../lib/supabase";
 
-export function LoginScreen({ onDemo, onSignedIn }: { onDemo: () => void; onSignedIn: () => void }) {
+export function LoginScreen({ onDemo, onSignedIn }: { onDemo: (view: "platform" | "tenant") => void; onSignedIn: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -52,7 +52,10 @@ export function LoginScreen({ onDemo, onSignedIn }: { onDemo: () => void; onSign
           <label>Contraseña<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••••" required /></label>
           {message && <div className="auth-message">{message}</div>}
           <button className="button primary full" disabled={loading}>{loading ? "Verificando…" : "Ingresar de forma segura"}</button>
-          <button type="button" className="demo-access" onClick={onDemo}>Ver demostración de la v0.2</button>
+          <div className="demo-options">
+            <button type="button" className="demo-access demo-tenant" onClick={() => onDemo("tenant")}><strong>Entrar al emprendimiento</strong><span>Probar stock, clientes, pedidos y portal</span></button>
+            <button type="button" className="demo-access" onClick={() => onDemo("platform")}><strong>Entrar como superadministrador</strong><span>Gestionar espacios, accesos y módulos</span></button>
+          </div>
           <small>{isSupabaseConfigured ? "Conexión Supabase disponible" : "Demostración local · Supabase pendiente de vinculación"}</small>
         </form>
       </section>

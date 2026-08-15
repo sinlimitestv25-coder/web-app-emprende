@@ -12,7 +12,7 @@ async function render() {
   );
 }
 
-test("renders the protected Nexo v0.2 entry", async () => {
+test("renders the protected Nexo v0.3 entry", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
@@ -20,7 +20,8 @@ test("renders the protected Nexo v0.2 entry", async () => {
   assert.match(html, /<title>Nexo/);
   assert.match(html, /Superadministración/);
   assert.match(html, /Aislamiento por diseño/);
-  assert.match(html, /Ver demostración de la v0\.2/);
+  assert.match(html, /Entrar al emprendimiento/);
+  assert.match(html, /Probar stock, clientes, pedidos y portal/);
   assert.doesNotMatch(html, /Todo en orden/);
   assert.doesNotMatch(html, /Ventas totales/);
   assert.doesNotMatch(html, /codex-preview/);

@@ -9,12 +9,14 @@ import { Spaces } from "./modules/Spaces";
 import { Administrators } from "./modules/Administrators";
 import { Plans } from "./modules/Plans";
 import { Activity } from "./modules/Activity";
+import { TenantApp } from "./tenant/TenantApp";
 
 export function AppShell() {
   const [active, setActive] = useState<NavId>("resumen");
   const [menuOpen, setMenuOpen] = useState(false);
   const [authState, setAuthState] = useState<"signed-out" | "signed-in">("signed-out");
   const [demoMode, setDemoMode] = useState(false);
+  const [demoView, setDemoView] = useState<"platform" | "tenant">("platform");
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -39,8 +41,12 @@ export function AppShell() {
     setAuthState("signed-out");
   }
 
+  if (demoMode && demoView === "tenant") {
+    return <TenantApp onExit={() => { setDemoMode(false); setDemoView("platform"); setAuthState("signed-out"); }} />;
+  }
+
   if (authState === "signed-out" && !demoMode) {
-    return <LoginScreen onDemo={() => { setDemoMode(true); setAuthState("signed-in"); }} onSignedIn={() => setAuthState("signed-in")} />;
+    return <LoginScreen onDemo={(view) => { setDemoView(view); setDemoMode(true); setAuthState("signed-in"); }} onSignedIn={() => setAuthState("signed-in")} />;
   }
 
   return (
