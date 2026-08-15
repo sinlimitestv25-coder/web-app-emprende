@@ -20,11 +20,11 @@ export type PlatformSpace = {
 };
 
 export const navItems: { id: NavId; label: string; glyph: string }[] = [
-  { id: "resumen", label: "Resumen", glyph: "R" },
-  { id: "espacios", label: "Espacios", glyph: "E" },
-  { id: "administradores", label: "Administradores", glyph: "U" },
-  { id: "planes", label: "Planes y módulos", glyph: "M" },
-  { id: "actividad", label: "Actividad", glyph: "A" },
+  { id: "resumen", label: "Resumen", glyph: "home" },
+  { id: "espacios", label: "Espacios", glyph: "spaces" },
+  { id: "administradores", label: "Administradores", glyph: "users" },
+  { id: "planes", label: "Planes y módulos", glyph: "plans" },
+  { id: "actividad", label: "Actividad", glyph: "activity" },
 ];
 
 export const spaces: PlatformSpace[] = [

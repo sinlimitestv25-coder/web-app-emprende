@@ -1,4 +1,5 @@
 import { platformEvents, spaces, type NavId } from "../../data/demo";
+import { AppIcon } from "../ui/AppIcon";
 
 export function PlatformDashboard({ onNavigate }: { onNavigate: (id: NavId) => void }) {
   return (
@@ -11,10 +12,10 @@ export function PlatformDashboard({ onNavigate }: { onNavigate: (id: NavId) => v
       <div className="privacy-banner"><span>✓</span><div><strong>Privacidad operativa activa</strong><p>Esta vista muestra estado, accesos y consumo. Clientes, pedidos, ventas y finanzas permanecen fuera de tu alcance.</p></div><button onClick={() => onNavigate("actividad")}>Ver auditoría</button></div>
 
       <div className="metric-grid platform-metrics">
-        <Metric label="Emprendimientos" value="3" note="2 activos · 1 configurando" />
-        <Metric label="Usuarios habilitados" value="4" note="1 invitación pendiente" />
-        <Metric label="Almacenamiento" value="2,5 GB" note="de 10,5 GB asignados" progress={24} />
-        <Metric label="Alertas de acceso" value="0" note="Sin incidentes abiertos" safe />
+        <Metric icon="spaces" tone="coral" label="Emprendimientos" value="3" note="2 activos · 1 configurando" />
+        <Metric icon="users" tone="mint" label="Usuarios habilitados" value="4" note="1 invitación pendiente" />
+        <Metric icon="storage" tone="lilac" label="Almacenamiento" value="2,5 GB" note="de 10,5 GB asignados" progress={24} />
+        <Metric icon="shield" tone="amber" label="Alertas de acceso" value="0" note="Sin incidentes abiertos" safe />
       </div>
 
       <div className="dashboard-grid platform-dashboard-grid">
@@ -40,14 +41,14 @@ export function PlatformDashboard({ onNavigate }: { onNavigate: (id: NavId) => v
       </div>
 
       <div className="quick-actions">
-        <button onClick={() => onNavigate("administradores")}><span>U</span><div><strong>Gestionar accesos</strong><small>Invitaciones, bloqueos y recuperación</small></div><b>→</b></button>
-        <button onClick={() => onNavigate("planes")}><span>M</span><div><strong>Planes y módulos</strong><small>Límites por emprendimiento</small></div><b>→</b></button>
-        <button onClick={() => onNavigate("actividad")}><span>A</span><div><strong>Auditoría</strong><small>Registro de acciones sensibles</small></div><b>→</b></button>
+        <button onClick={() => onNavigate("administradores")}><span><AppIcon name="users" /></span><div><strong>Gestionar accesos</strong><small>Invitaciones, bloqueos y recuperación</small></div><b>→</b></button>
+        <button onClick={() => onNavigate("planes")}><span><AppIcon name="plans" /></span><div><strong>Planes y módulos</strong><small>Límites por emprendimiento</small></div><b>→</b></button>
+        <button onClick={() => onNavigate("actividad")}><span><AppIcon name="activity" /></span><div><strong>Auditoría</strong><small>Registro de acciones sensibles</small></div><b>→</b></button>
       </div>
     </>
   );
 }
 
-function Metric({ label, value, note, progress, safe }: { label: string; value: string; note: string; progress?: number; safe?: boolean }) {
-  return <article className="metric-card platform-metric"><div><span>{label}</span><strong>{value}</strong><small className={safe ? "positive" : ""}>{safe ? "✓ " : ""}{note}</small>{progress !== undefined && <div className="mini-progress"><i style={{ width: `${progress}%` }} /></div>}</div></article>;
+function Metric({ icon, tone, label, value, note, progress, safe }: { icon: string; tone: string; label: string; value: string; note: string; progress?: number; safe?: boolean }) {
+  return <article className="metric-card platform-metric"><div><span>{label}</span><strong>{value}</strong><small className={safe ? "positive" : ""}>{safe ? "✓ " : ""}{note}</small>{progress !== undefined && <div className="mini-progress"><i style={{ width: `${progress}%` }} /></div>}</div><span className={`metric-symbol ${tone}`}><AppIcon name={icon} label={label} /></span></article>;
 }

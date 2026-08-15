@@ -63,12 +63,12 @@ export type TenantDemoState = {
 };
 
 export const tenantNavItems: { id: TenantNavId; label: string; glyph: string }[] = [
-  { id: "inicio", label: "Inicio", glyph: "I" },
-  { id: "inventario", label: "Productos y stock", glyph: "S" },
-  { id: "clientes", label: "Clientes", glyph: "C" },
-  { id: "proveedores", label: "Proveedores", glyph: "P" },
-  { id: "pedidos", label: "Pedidos y ventas", glyph: "V" },
-  { id: "portal", label: "Portal de ventas", glyph: "W" },
+  { id: "inicio", label: "Inicio", glyph: "home" },
+  { id: "inventario", label: "Productos y stock", glyph: "inventory" },
+  { id: "clientes", label: "Clientes", glyph: "customers" },
+  { id: "proveedores", label: "Proveedores", glyph: "suppliers" },
+  { id: "pedidos", label: "Pedidos y ventas", glyph: "orders" },
+  { id: "portal", label: "Portal de ventas", glyph: "portal" },
 ];
 
 export const defaultTenantDemo: TenantDemoState = {
