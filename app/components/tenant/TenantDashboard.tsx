@@ -12,7 +12,10 @@ export function TenantDashboard({ state, onNavigate }: { state: TenantDemoState;
   const openOrders = state.orders.filter((order) => !["Entregado", "Cancelado"].includes(order.status));
 
   return <>
-    <div className="page-heading"><div><p className="eyebrow">Resumen del negocio</p><h1>Hola, Marina</h1><p>Así viene Luna Creativa con los datos de prueba de agosto.</p></div><div className="heading-actions"><button className="button secondary" onClick={() => onNavigate("portal")}>Ver portal</button><button className="button primary" onClick={() => onNavigate("pedidos")}>+ Nuevo pedido</button></div></div>
+    <section className="tenant-welcome-banner">
+      <div className="tenant-welcome-content"><p className="eyebrow">Resumen del negocio</p><h1>Hola, Marina</h1><p>Todo lo importante de Luna Creativa, claro y a mano.</p><div className="heading-actions"><button className="button banner-secondary" onClick={() => onNavigate("portal")}>Ver portal</button><button className="button banner-primary" onClick={() => onNavigate("pedidos")}>+ Nuevo pedido</button></div></div>
+      <span className="tenant-banner-chip">Sábado 15 de agosto · Datos de prueba</span>
+    </section>
     <div className="metric-grid tenant-metrics">
       <article className="metric-card"><div><span>Ventas entregadas</span><strong>{money.format(sales)}</strong><small className="positive">{delivered.length} ventas concretadas</small></div><span className="metric-symbol coral">$</span></article>
       <article className="metric-card"><div><span>Ganancia estimada</span><strong>{money.format(sales - estimatedCost)}</strong><small>Venta menos costo cargado</small></div><span className="metric-symbol mint">↗</span></article>

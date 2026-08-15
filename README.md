@@ -1,4 +1,4 @@
-# Nexo v0.3
+# Nexo v0.3.1
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -28,6 +28,13 @@ SaaS multitenant para administrar emprendimientos. Esta versión mantiene separa
 - persistencia local de los datos de prueba y restablecimiento seguro.
 
 Desde la pantalla de acceso se puede elegir entre la demostración del emprendimiento y la superadministración. Los datos de prueba se guardan solamente en el navegador y todavía no se escriben en Supabase.
+
+### Mejora visual 0.3.1
+
+- banner panorámico propio de Luna Creativa al ingresar al negocio;
+- textos, botones, tablas y formularios con mayor tamaño de lectura;
+- tarjetas con bordes más definidos y sombras visibles;
+- adaptación del banner y la nueva escala tipográfica para celular.
 
 ## Configuración
 
