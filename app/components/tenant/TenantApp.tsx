@@ -27,7 +27,13 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
   });
   const [notice, setNotice] = useState("");
 
-  useEffect(() => { window.localStorage.setItem(tenantStorageKey, JSON.stringify(state)); }, [state]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(tenantStorageKey, JSON.stringify(state));
+    } catch {
+      flash("No se pudo guardar: el navegador está sin espacio. Probá con imágenes más livianas.");
+    }
+  }, [state]);
 
   const lowStock = useMemo(() => state.products.filter((product) => product.stock <= product.minStock).length, [state.products]);
 

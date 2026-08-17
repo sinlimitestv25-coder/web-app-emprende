@@ -6,11 +6,13 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { defaultTenantDemo, tenantStorageKey, type TenantDemoState } from "../../data/tenant-demo";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const slideIntervalMs = 5000;
 
 export function PublicStore({ slug }: { slug: string }) {
   const [state, setState] = useState<TenantDemoState>(defaultTenantDemo);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [cartOpen, setCartOpen] = useState(false);
+  const [slide, setSlide] = useState(0);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(tenantStorageKey);
@@ -28,6 +30,14 @@ export function PublicStore({ slug }: { slug: string }) {
   const cartLines = useMemo(() => published.filter((product) => cart[product.id]).map((product) => ({ ...product, quantity: cart[product.id] })), [cart, published]);
   const cartTotal = cartLines.reduce((total, line) => total + line.price * line.quantity, 0);
   const cartCount = Object.values(cart).reduce((total, quantity) => total + quantity, 0);
+  const bannerImages = portal.bannerImages;
+
+  useEffect(() => {
+    setSlide(0);
+    if (bannerImages.length < 2) return;
+    const timer = window.setInterval(() => setSlide((current) => (current + 1) % bannerImages.length), slideIntervalMs);
+    return () => window.clearInterval(timer);
+  }, [bannerImages.length]);
 
   function add(productId: string) {
     const product = published.find((item) => item.id === productId);
@@ -78,7 +88,14 @@ export function PublicStore({ slug }: { slug: string }) {
       </header>
 
       <section className="public-store-hero">
-        <div>
+        {bannerImages.length > 0 && (
+          <div className="public-store-hero-slides">
+            {bannerImages.map((src, index) => (
+              <div key={index} className={index === slide ? "public-store-slide active" : "public-store-slide"} style={{ backgroundImage: `url(${src})` }} />
+            ))}
+          </div>
+        )}
+        <div className="public-store-hero-content">
           <span className="public-store-eyebrow">Hecho especialmente para vos</span>
           <h1>{portal.headline}</h1>
           <p>{portal.description}</p>
@@ -86,6 +103,13 @@ export function PublicStore({ slug }: { slug: string }) {
             Ver productos
           </button>
         </div>
+        {bannerImages.length > 1 && (
+          <div className="public-store-hero-dots">
+            {bannerImages.map((_, index) => (
+              <button key={index} type="button" className={index === slide ? "active" : ""} aria-label={`Ir a la imagen ${index + 1}`} onClick={() => setSlide(index)} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="public-store-catalog" id="catalogo">
@@ -100,11 +124,11 @@ export function PublicStore({ slug }: { slug: string }) {
           {published.map((product, index) => (
             <article key={product.id} className={`public-store-card tone-${index % 4}`}>
               <div className="public-store-thumb">
-                <span>{product.category.slice(0, 1)}</span>
+                {product.image ? <img src={product.image} alt={product.name} /> : <span>{product.category.slice(0, 1)}</span>}
                 {product.stock <= product.minStock && <small>Últimas {product.stock}</small>}
               </div>
               <strong>{product.name}</strong>
-              <p>{product.variant}</p>
+              <p>{product.description || product.variant}</p>
               <footer>
                 <b>{money.format(product.price)}</b>
                 <button type="button" onClick={() => add(product.id)}>Agregar +</button>

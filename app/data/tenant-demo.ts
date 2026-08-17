@@ -6,6 +6,8 @@ export type Product = {
   sku: string;
   category: string;
   variant: string;
+  description: string;
+  image: string;
   stock: number;
   minStock: number;
   price: number;
@@ -53,6 +55,7 @@ export type PortalSettings = {
   whatsapp: string;
   accent: string;
   published: boolean;
+  bannerImages: string[];
 };
 
 export type TenantDemoState = {
@@ -76,12 +79,12 @@ export const tenantNavItems: { id: TenantNavId; label: string; glyph: string }[]
 
 export const defaultTenantDemo: TenantDemoState = {
   products: [
-    { id: "prd_01", name: "Taza Dragon Ball", sku: "TAZ-DB-001", category: "Tazas", variant: "Cerámica · 325 ml", stock: 8, minStock: 3, price: 12500, cost: 6900, published: true },
-    { id: "prd_02", name: "Vaso térmico Minnie", sku: "VAS-MN-002", category: "Vasos térmicos", variant: "Acero · 500 ml", stock: 2, minStock: 3, price: 24500, cost: 14800, published: true },
-    { id: "prd_03", name: "Llavero Stitch", sku: "LLA-ST-003", category: "Llaveros", variant: "Acrílico · 6 cm", stock: 14, minStock: 5, price: 4800, cost: 2100, published: true },
-    { id: "prd_04", name: "Vinilo nombre personalizado", sku: "VIN-NO-004", category: "Vinilos", variant: "20 × 8 cm", stock: 21, minStock: 6, price: 7200, cost: 2300, published: true },
-    { id: "prd_05", name: "Taza mágica personalizada", sku: "TAZ-MG-005", category: "Tazas", variant: "Negra · 325 ml", stock: 0, minStock: 2, price: 15800, cost: 8500, published: false },
-    { id: "prd_06", name: "Botella infantil Disney", sku: "BOT-DI-006", category: "Botellas", variant: "Aluminio · 600 ml", stock: 5, minStock: 2, price: 18900, cost: 10500, published: true },
+    { id: "prd_01", name: "Taza Dragon Ball", sku: "TAZ-DB-001", category: "Tazas", variant: "Cerámica · 325 ml", description: "", image: "", stock: 8, minStock: 3, price: 12500, cost: 6900, published: true },
+    { id: "prd_02", name: "Vaso térmico Minnie", sku: "VAS-MN-002", category: "Vasos térmicos", variant: "Acero · 500 ml", description: "", image: "", stock: 2, minStock: 3, price: 24500, cost: 14800, published: true },
+    { id: "prd_03", name: "Llavero Stitch", sku: "LLA-ST-003", category: "Llaveros", variant: "Acrílico · 6 cm", description: "", image: "", stock: 14, minStock: 5, price: 4800, cost: 2100, published: true },
+    { id: "prd_04", name: "Vinilo nombre personalizado", sku: "VIN-NO-004", category: "Vinilos", variant: "20 × 8 cm", description: "", image: "", stock: 21, minStock: 6, price: 7200, cost: 2300, published: true },
+    { id: "prd_05", name: "Taza mágica personalizada", sku: "TAZ-MG-005", category: "Tazas", variant: "Negra · 325 ml", description: "", image: "", stock: 0, minStock: 2, price: 15800, cost: 8500, published: false },
+    { id: "prd_06", name: "Botella infantil Disney", sku: "BOT-DI-006", category: "Botellas", variant: "Aluminio · 600 ml", description: "", image: "", stock: 5, minStock: 2, price: 18900, cost: 10500, published: true },
   ],
   customers: [
     { id: "cli_01", name: "Camila Torres", phone: "+54 9 11 6123-4490", email: "camila@email.com", notes: "Prefiere retirar por la tarde." },
@@ -108,5 +111,6 @@ export const defaultTenantDemo: TenantDemoState = {
     whatsapp: "5491161234490",
     accent: "#e7674e",
     published: true,
+    bannerImages: [],
   },
 };

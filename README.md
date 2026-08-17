@@ -1,4 +1,4 @@
-# Nexo v0.3.2
+# Nexo v0.4
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -44,6 +44,15 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - sistema único de iconos para navegación, métricas, resúmenes y acciones;
 - tarjetas con sombras más profundas y respuesta al pasar el mouse;
 - iconos destacados en inventario, clientes, proveedores, pedidos y superadministración.
+
+### Portal público y catálogo visual 0.4
+
+- vidriera pública real en `/tienda/[slug]`, con dirección propia editable desde el portal;
+- enlace del portal grande y visible, con botones para abrir, copiar y enviar por WhatsApp;
+- carga de fotos por producto y descripción para el portal, con el mismo modal en Inventario y en Portal;
+- catálogo visual del portal con foto, precio y publicación de cada producto;
+- banner de portada con carrusel de imágenes propias en vez del bosquejo anterior;
+- guardado defendido ante datos de prueba antiguos y ante el límite de almacenamiento del navegador.
 
 ## Configuración
 
