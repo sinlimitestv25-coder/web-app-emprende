@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { defaultTenantDemo, tenantNavItems, type OrderStatus, type TenantDemoState, type TenantNavId } from "../../data/tenant-demo";
+import { defaultTenantDemo, tenantNavItems, tenantStorageKey, type OrderStatus, type TenantDemoState, type TenantNavId } from "../../data/tenant-demo";
 import { TenantDashboard } from "./TenantDashboard";
 import { TenantInventory } from "./TenantInventory";
 import { TenantContacts } from "./TenantContacts";
@@ -9,21 +9,25 @@ import { TenantOrders } from "./TenantOrders";
 import { TenantPortal } from "./TenantPortal";
 import { AppIcon } from "../ui/AppIcon";
 
-const storageKey = "nexo-v0.3-luna-creativa";
-
 export function TenantApp({ onExit }: { onExit: () => void }) {
   const [active, setActive] = useState<TenantNavId>("inicio");
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(false);
   const [state, setState] = useState<TenantDemoState>(() => {
     if (typeof window === "undefined") return defaultTenantDemo;
-    const saved = window.localStorage.getItem(storageKey);
+    const saved = window.localStorage.getItem(tenantStorageKey);
     if (!saved) return defaultTenantDemo;
-    try { return JSON.parse(saved) as TenantDemoState; } catch { window.localStorage.removeItem(storageKey); return defaultTenantDemo; }
+    try {
+      const parsed = JSON.parse(saved) as TenantDemoState;
+      return { ...parsed, portal: { ...defaultTenantDemo.portal, ...parsed.portal } };
+    } catch {
+      window.localStorage.removeItem(tenantStorageKey);
+      return defaultTenantDemo;
+    }
   });
   const [notice, setNotice] = useState("");
 
-  useEffect(() => { window.localStorage.setItem(storageKey, JSON.stringify(state)); }, [state]);
+  useEffect(() => { window.localStorage.setItem(tenantStorageKey, JSON.stringify(state)); }, [state]);
 
   const lowStock = useMemo(() => state.products.filter((product) => product.stock <= product.minStock).length, [state.products]);
 
@@ -66,7 +70,7 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
 
   function resetDemo() {
     setState(defaultTenantDemo);
-    window.localStorage.removeItem(storageKey);
+    window.localStorage.removeItem(tenantStorageKey);
     flash("La demostración volvió a sus datos originales.");
   }
 

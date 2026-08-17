@@ -46,6 +46,7 @@ export type Order = {
 };
 
 export type PortalSettings = {
+  slug: string;
   storeName: string;
   headline: string;
   description: string;
@@ -61,6 +62,8 @@ export type TenantDemoState = {
   orders: Order[];
   portal: PortalSettings;
 };
+
+export const tenantStorageKey = "nexo-v0.3-luna-creativa";
 
 export const tenantNavItems: { id: TenantNavId; label: string; glyph: string }[] = [
   { id: "inicio", label: "Inicio", glyph: "home" },
@@ -98,6 +101,7 @@ export const defaultTenantDemo: TenantDemoState = {
     { id: "PED-1045", customerId: "cli_03", customerName: "Valentina López", productId: "prd_03", productName: "Llavero Stitch", quantity: 2, unitPrice: 4800, total: 9600, status: "Entregado", createdAt: "12 ago, 16:05", stockCommitted: true },
   ],
   portal: {
+    slug: "luna-creativa",
     storeName: "Luna Creativa",
     headline: "Regalos hechos para sorprender",
     description: "Tazas, vinilos y detalles personalizados preparados con mucho amor.",
