@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { defaultTenantDemo, tenantNavItems, tenantStorageKey, type OrderStatus, type TenantDemoState, type TenantNavId } from "../../data/tenant-demo";
+import { defaultTenantDemo, migrateOrders, tenantNavItems, tenantStorageKey, type OrderStatus, type TenantDemoState, type TenantNavId } from "../../data/tenant-demo";
 import { TenantDashboard } from "./TenantDashboard";
 import { TenantInventory } from "./TenantInventory";
 import { TenantContacts } from "./TenantContacts";
@@ -20,7 +20,7 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
     if (!saved) return defaultTenantDemo;
     try {
       const parsed = JSON.parse(saved) as TenantDemoState;
-      return { ...parsed, portal: { ...defaultTenantDemo.portal, ...parsed.portal }, categories: parsed.categories?.length ? parsed.categories : defaultTenantDemo.categories };
+      return { ...parsed, portal: { ...defaultTenantDemo.portal, ...parsed.portal }, categories: parsed.categories?.length ? parsed.categories : defaultTenantDemo.categories, orders: migrateOrders(parsed.orders) };
     } catch {
       window.localStorage.removeItem(tenantStorageKey);
       return defaultTenantDemo;

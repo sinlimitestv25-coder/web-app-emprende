@@ -74,6 +74,32 @@ export type TenantDemoState = {
 
 export const tenantStorageKey = "nexo-v0.3-luna-creativa";
 
+// Versiones anteriores a v0.6 guardaban un solo producto por pedido
+// (productId/productName/quantity/unitPrice sueltos, sin "items").
+// Esto adapta esos pedidos guardados en el navegador al formato nuevo.
+type LegacyOrder = Partial<Order> & {
+  productId?: string;
+  productName?: string;
+  quantity?: number;
+  unitPrice?: number;
+};
+
+export function migrateOrders(orders: unknown): Order[] {
+  if (!Array.isArray(orders)) return [];
+  return (orders as LegacyOrder[]).map((order) => ({
+    id: order.id ?? `PED-${Date.now()}`,
+    customerId: order.customerId ?? "",
+    customerName: order.customerName ?? "",
+    items: Array.isArray(order.items) && order.items.length > 0
+      ? order.items
+      : [{ productId: order.productId ?? "", productName: order.productName ?? "Producto", quantity: order.quantity ?? 1, unitPrice: order.unitPrice ?? 0 }],
+    total: order.total ?? 0,
+    status: order.status ?? "Nuevo",
+    createdAt: order.createdAt ?? "",
+    stockCommitted: order.stockCommitted ?? false,
+  }));
+}
+
 export const tenantNavItems: { id: TenantNavId; label: string; glyph: string }[] = [
   { id: "inicio", label: "Inicio", glyph: "home" },
   { id: "inventario", label: "Productos y stock", glyph: "inventory" },

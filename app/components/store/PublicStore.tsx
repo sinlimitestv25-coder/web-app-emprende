@@ -3,7 +3,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions -- modal backdrop is only a pointer shortcut, closable by its own button */
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { defaultTenantDemo, tenantStorageKey, type Order, type TenantDemoState } from "../../data/tenant-demo";
+import { defaultTenantDemo, migrateOrders, tenantStorageKey, type Order, type TenantDemoState } from "../../data/tenant-demo";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 const slideIntervalMs = 5000;
@@ -22,7 +22,7 @@ export function PublicStore({ slug }: { slug: string }) {
     if (!saved) return;
     try {
       const parsed = JSON.parse(saved) as TenantDemoState;
-      setState({ ...parsed, portal: { ...defaultTenantDemo.portal, ...parsed.portal }, categories: parsed.categories?.length ? parsed.categories : defaultTenantDemo.categories });
+      setState({ ...parsed, portal: { ...defaultTenantDemo.portal, ...parsed.portal }, categories: parsed.categories?.length ? parsed.categories : defaultTenantDemo.categories, orders: migrateOrders(parsed.orders) });
     } catch {
       /* datos de prueba corruptos: se ignoran */
     }
@@ -69,7 +69,12 @@ export function PublicStore({ slug }: { slug: string }) {
     const saved = window.localStorage.getItem(tenantStorageKey);
     let latest = state;
     if (saved) {
-      try { latest = JSON.parse(saved) as TenantDemoState; } catch { latest = state; }
+      try {
+        const parsed = JSON.parse(saved) as TenantDemoState;
+        latest = { ...parsed, orders: migrateOrders(parsed.orders) };
+      } catch {
+        latest = state;
+      }
     }
 
     const phoneDigits = buyerPhone.replace(/\D/g, "");
