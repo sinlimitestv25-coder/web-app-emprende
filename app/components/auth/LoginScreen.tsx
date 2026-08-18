@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { getSupabase, isSupabaseConfigured, requirePlatformAdmin } from "../../lib/supabase";
+import { version } from "../../../package.json";
 
 export function LoginScreen({ onDemo, onSignedIn }: { onDemo: (view: "platform" | "tenant") => void; onSignedIn: () => void }) {
   const [email, setEmail] = useState("");
@@ -39,14 +40,14 @@ export function LoginScreen({ onDemo, onSignedIn }: { onDemo: (view: "platform" 
   return (
     <main className="login-page">
       <section className="login-brand-panel">
-        <div className="login-brand"><span className="brand-mark">N</span><strong>Nexo</strong></div>
-        <div className="login-message"><p>PLATAFORMA MULTITENANT</p><h1>Administrá el crecimiento.<br/>Protegé cada negocio.</h1><span>Un panel exclusivamente diseñado para crear espacios, gestionar accesos y controlar la plataforma sin entrar en la operación privada de los emprendimientos.</span></div>
-        <div className="login-security"><i>✓</i><span><strong>Aislamiento por diseño</strong>Las reglas de acceso se aplican también en la base de datos.</span></div>
+        <div className="login-brand"><img src="/nexo-icon.png" alt="" className="login-brand-icon" /><strong className="login-brand-word">Nex<span>o</span></strong></div>
+        <p className="login-slogan">El nexo que conecta tu negocio.</p>
+        <div className="login-message"><p>PLATAFORMA MULTITENANT</p><h1>Administrá el crecimiento.<br/>Protegé cada negocio.</h1></div>
       </section>
       <section className="login-form-panel">
         <form className="login-card" onSubmit={submit}>
           <p className="eyebrow">Acceso restringido</p>
-          <h2>Superadministración</h2>
+          <h2>Ingreso</h2>
           <p>Ingresá con tu cuenta autorizada de Nexo.</p>
           <label>Correo electrónico<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@correo.com" required /></label>
           <label>Contraseña<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••••" required /></label>
@@ -57,6 +58,10 @@ export function LoginScreen({ onDemo, onSignedIn }: { onDemo: (view: "platform" 
             <button type="button" className="demo-access" onClick={() => onDemo("platform")}><strong>Entrar como superadministrador</strong><span>Gestionar espacios, accesos y módulos</span></button>
           </div>
           <small>{isSupabaseConfigured ? "Conexión Supabase disponible" : "Demostración local · Supabase pendiente de vinculación"}</small>
+          <div className="login-footer">
+            <div className="login-footer-links"><span>Términos de uso</span><span>Privacidad</span></div>
+            <p>© CIR Soluciones Digitales · v{version}</p>
+          </div>
         </form>
       </section>
     </main>
