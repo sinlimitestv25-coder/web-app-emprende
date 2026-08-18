@@ -29,7 +29,7 @@ export function TenantDashboard({ state, onNavigate }: { state: TenantDemoState;
 
   return <>
     <section className="tenant-welcome-banner">
-      <div className="tenant-welcome-content"><p className="eyebrow">Resumen del negocio</p><h1>Hola, Natalia</h1><p>Todo lo importante de Luna Creativa, claro y a mano.</p><div className="heading-actions"><button className="button banner-secondary" onClick={() => onNavigate("portal")}>Ver portal</button><button className="button banner-primary" onClick={() => onNavigate("pedidos")}>+ Nuevo pedido</button></div></div>
+      <div className="tenant-welcome-content"><p className="eyebrow">Resumen del negocio</p><h1>Hola, Natalia</h1><p>Todo lo importante de Pensando en ti, claro y a mano.</p><div className="heading-actions"><button className="button banner-secondary" onClick={() => onNavigate("portal")}>Ver portal</button><button className="button banner-primary" onClick={() => onNavigate("pedidos")}>+ Nuevo pedido</button></div></div>
       <span className="tenant-banner-chip">Sábado 15 de agosto · Datos de prueba</span>
     </section>
     <div className="metric-grid tenant-metrics">

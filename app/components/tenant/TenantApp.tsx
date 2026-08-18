@@ -95,7 +95,7 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
   return (
     <div className="app-shell tenant-shell">
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""} ${sidebarPinned ? "sidebar-pinned" : ""}`}>
-        <button className="brand" onClick={() => navigate("inicio")} aria-label="Ir al inicio"><span className="brand-mark">N</span><span className="sidebar-copy"><strong>Nexo</strong><small>gestión de negocio</small></span></button>
+        <button className="brand" onClick={() => navigate("inicio")} aria-label="Ir al inicio"><img src="/nexo-logo.png" alt="" className="brand-mark" /><span className="sidebar-copy"><strong>Nexo</strong><small>gestión de negocio</small></span></button>
         <button className="sidebar-pin" type="button" onClick={() => setSidebarPinned((current) => !current)} aria-label={sidebarPinned ? "Desfijar menú lateral" : "Fijar menú lateral"} title={sidebarPinned ? "Dejar menú compacto" : "Mantener menú abierto"}>{sidebarPinned ? "‹" : "›"}</button>
         <div className="workspace-switcher">{state.portal.logo ? <img src={state.portal.logo} alt="" className="workspace-logo" /> : <span className="avatar avatar-coral">{state.portal.storeName.split(" ").map((word) => word[0]).slice(0, 2).join("")}</span>}<span className="sidebar-copy"><small>Mi emprendimiento</small><strong>{state.portal.storeName}</strong></span></div>
         <nav aria-label="Navegación del emprendimiento">

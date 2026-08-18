@@ -55,7 +55,7 @@ export function AppShell() {
     <div className="app-shell">
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""} ${sidebarPinned ? "sidebar-pinned" : ""}`}>
         <button className="brand" onClick={() => navigate("resumen")} aria-label="Ir al resumen">
-          <span className="brand-mark">N</span>
+          <img src="/nexo-logo.png" alt="" className="brand-mark" />
           <span className="sidebar-copy"><strong>Nexo</strong><small>plataforma SaaS</small></span>
         </button>
         <button className="sidebar-pin" type="button" onClick={() => setSidebarPinned((current) => !current)} aria-label={sidebarPinned ? "Desfijar menú lateral" : "Fijar menú lateral"} title={sidebarPinned ? "Dejar menú compacto" : "Mantener menú abierto"}>{sidebarPinned ? "‹" : "›"}</button>
