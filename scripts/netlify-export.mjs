@@ -35,13 +35,14 @@ await writeFile(new URL("../dist/index.html", import.meta.url), await renderPage
 
 // Pre-renderiza la vidriera pública de la tienda demo para que el enlace funcione
 // como página estática propia, sin depender del catch-all de rutas desconocidas.
-await mkdir(new URL("../dist/tienda/luna-creativa/", import.meta.url), { recursive: true });
+// Este slug debe coincidir siempre con defaultTenantDemo.portal.slug en app/data/tenant-demo.ts.
+await mkdir(new URL("../dist/tienda/pensando-en-ti/", import.meta.url), { recursive: true });
 await writeFile(
-  new URL("../dist/tienda/luna-creativa/index.html", import.meta.url),
-  await renderPage("/tienda/luna-creativa"),
+  new URL("../dist/tienda/pensando-en-ti/index.html", import.meta.url),
+  await renderPage("/tienda/pensando-en-ti"),
   "utf8",
 );
 
 await writeFile(new URL("../dist/_redirects", import.meta.url), "/*  /index.html  200\n", "utf8");
 
-console.log("Netlify export ready in dist/ (incluye /tienda/luna-creativa)");
+console.log("Netlify export ready in dist/ (incluye /tienda/pensando-en-ti)");
