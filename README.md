@@ -1,4 +1,4 @@
-# Nexo v0.8
+# Nexo v0.8.1
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -121,6 +121,14 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - panel izquierdo simplificado: solo el encabezado y el título, sin el párrafo ni el bloque de "Aislamiento por diseño";
 - el título del formulario pasó de "Superadministración" a "Ingreso";
 - pie de página nuevo con Términos de uso, Privacidad, y "© CIR Soluciones Digitales" con la versión de la app (se actualiza sola desde `package.json`).
+
+### Ajustes de login 0.8.1
+
+- logo de Nexo al doble de tamaño;
+- eslogan corregido a "Gestión que conecta", con una tipografía más elegante (serif itálica);
+- "PLATAFORMA MULTITENANT" y el título bajaron de posición, más cerca de donde estaban en el diseño original;
+- se sacó la segunda línea del título ("Protegé cada negocio"), queda solo "Administrá el crecimiento.";
+- colores de acento del login pasaron de naranja a verde/azul, acordes al logo de Nexo (título "Ingreso", botón de acceso, enlace del emprendimiento demo, foco de los campos).
 
 ## Configuración
 

@@ -40,9 +40,11 @@ export function LoginScreen({ onDemo, onSignedIn }: { onDemo: (view: "platform" 
   return (
     <main className="login-page">
       <section className="login-brand-panel">
-        <div className="login-brand"><img src="/nexo-icon.png" alt="" className="login-brand-icon" /><strong className="login-brand-word">Nex<span>o</span></strong></div>
-        <p className="login-slogan">El nexo que conecta tu negocio.</p>
-        <div className="login-message"><p>PLATAFORMA MULTITENANT</p><h1>Administrá el crecimiento.<br/>Protegé cada negocio.</h1></div>
+        <div className="login-top">
+          <div className="login-brand"><img src="/nexo-icon.png" alt="" className="login-brand-icon" /><strong className="login-brand-word">Nex<span>o</span></strong></div>
+          <p className="login-slogan">Gestión que conecta</p>
+        </div>
+        <div className="login-message"><p>PLATAFORMA MULTITENANT</p><h1>Administrá el crecimiento.</h1></div>
       </section>
       <section className="login-form-panel">
         <form className="login-card" onSubmit={submit}>
