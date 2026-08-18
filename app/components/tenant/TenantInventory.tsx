@@ -7,9 +7,9 @@ import type { Product } from "../../data/tenant-demo";
 import { AppIcon } from "../ui/AppIcon";
 import { ProductModal, emptyProductForm, type ProductFormState } from "./ProductModal";
 
-const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 
-export function TenantInventory({ products, setProducts, flash }: { products: Product[]; setProducts: (products: Product[]) => void; flash: (message: string) => void }) {
+export function TenantInventory({ products, setProducts, categories, flash }: { products: Product[]; setProducts: (products: Product[]) => void; categories: string[]; flash: (message: string) => void }) {
   const [search, setSearch] = useState("");
   const [lowOnly, setLowOnly] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -47,7 +47,7 @@ export function TenantInventory({ products, setProducts, flash }: { products: Pr
     {low.length > 0 && <div className="inventory-alert"><span>!</span><div><strong>{low.length} productos necesitan atención</strong><p>Los artículos sin unidades se ocultan automáticamente del portal.</p></div><button onClick={() => setLowOnly((current) => !current)}>{lowOnly ? "Ver todos" : "Revisar stock"}</button></div>}
     <div className="summary-strip icon-summary"><SummaryStat icon="inventory" tone="coral" label="Productos" value={String(products.length)} /><SummaryStat icon="stock" tone="mint" label="Unidades disponibles" value={String(units)} /><SummaryStat icon="money" tone="lilac" label="Valor a costo" value={money.format(inventoryValue)} /><SummaryStat icon="portal" tone="amber" label="Publicados" value={String(products.filter((product) => product.published && product.stock > 0).length)} /></div>
     <section className="panel table-panel inventory-table"><div className="table-tools"><label className="search-field">⌕<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nombre, categoría o código…" /></label><span className="table-result">{visible.length} resultados</span></div><div className="inventory-head"><span>Producto</span><span>Stock</span><span>Mínimo</span><span>Costo</span><span>Precio</span><span>Portal</span></div>{visible.map((product) => <div className="inventory-row" key={product.id}><div>{product.image ? <img src={product.image} alt="" className="product-thumb product-thumb-image" /> : <span className="product-thumb">{product.category.slice(0, 1)}</span>}<div><strong>{product.name}</strong><small>{product.sku} · {product.variant}</small></div></div><strong className={product.stock <= product.minStock ? "stock-number low" : "stock-number"}>{product.stock}</strong><span>{product.minStock}</span><span>{money.format(product.cost)}</span><strong>{money.format(product.price)}</strong><div className="row-actions"><button className={product.published && product.stock > 0 ? "switch active" : "switch"} onClick={() => togglePublished(product.id)} aria-label={`${product.published ? "Ocultar" : "Publicar"} ${product.name}`}><i /></button><button className="row-action" onClick={() => openProduct(product)}>Editar</button></div></div>)}{visible.length === 0 && <div className="empty-state">No encontramos productos con esa búsqueda.</div>}</section>
-    {formOpen && <ProductModal form={form} setForm={setForm} editing={editing !== null} onClose={() => setFormOpen(false)} onSubmit={save} flash={flash} />}
+    {formOpen && <ProductModal form={form} setForm={setForm} editing={editing !== null} categories={categories} onClose={() => setFormOpen(false)} onSubmit={save} flash={flash} />}
   </>;
 }
 

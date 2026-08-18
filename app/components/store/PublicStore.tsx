@@ -3,9 +3,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions -- modal backdrop is only a pointer shortcut, closable by its own button */
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { defaultTenantDemo, tenantStorageKey, type TenantDemoState } from "../../data/tenant-demo";
+import { defaultTenantDemo, tenantStorageKey, type Order, type TenantDemoState } from "../../data/tenant-demo";
 
-const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 const slideIntervalMs = 5000;
 
 export function PublicStore({ slug }: { slug: string }) {
@@ -13,13 +13,16 @@ export function PublicStore({ slug }: { slug: string }) {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [cartOpen, setCartOpen] = useState(false);
   const [slide, setSlide] = useState(0);
+  const [buyerName, setBuyerName] = useState("");
+  const [buyerPhone, setBuyerPhone] = useState("");
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     const saved = window.localStorage.getItem(tenantStorageKey);
     if (!saved) return;
     try {
       const parsed = JSON.parse(saved) as TenantDemoState;
-      setState({ ...parsed, portal: { ...defaultTenantDemo.portal, ...parsed.portal } });
+      setState({ ...parsed, portal: { ...defaultTenantDemo.portal, ...parsed.portal }, categories: parsed.categories?.length ? parsed.categories : defaultTenantDemo.categories });
     } catch {
       /* datos de prueba corruptos: se ignoran */
     }
@@ -49,7 +52,58 @@ export function PublicStore({ slug }: { slug: string }) {
     setCart((current) => ({ ...current, [productId]: Math.max(0, (current[productId] ?? 0) - 1) }));
   }
 
+  function flash(text: string) {
+    setNotice(text);
+    window.setTimeout(() => setNotice(""), 2800);
+  }
+
   const message = encodeURIComponent(`Hola ${portal.storeName}, quiero hacer este pedido:\n${cartLines.map((line) => `• ${line.name} × ${line.quantity} — ${money.format(line.price * line.quantity)}`).join("\n")}\nTotal: ${money.format(cartTotal)}`);
+  const whatsappUrl = `https://wa.me/${portal.whatsapp}?text=${message}`;
+
+  function checkout() {
+    if (!buyerName.trim() || !buyerPhone.trim()) {
+      flash("Ingresá tu nombre y tu WhatsApp para enviar el pedido.");
+      return;
+    }
+
+    const saved = window.localStorage.getItem(tenantStorageKey);
+    let latest = state;
+    if (saved) {
+      try { latest = JSON.parse(saved) as TenantDemoState; } catch { latest = state; }
+    }
+
+    const phoneDigits = buyerPhone.replace(/\D/g, "");
+    const existing = latest.customers.find((customer) => customer.phone.replace(/\D/g, "") === phoneDigits);
+    const customer = existing ?? { id: `cli_${Date.now()}`, name: buyerName.trim(), phone: buyerPhone.trim(), email: "", notes: "Pedido realizado desde el portal." };
+    const customers = existing ? latest.customers : [customer, ...latest.customers];
+
+    const newOrders: Order[] = cartLines.map((line, index) => ({
+      id: `PED-${1049 + latest.orders.length + index}`,
+      customerId: customer.id,
+      customerName: customer.name,
+      productId: line.id,
+      productName: line.name,
+      quantity: line.quantity,
+      unitPrice: line.price,
+      total: line.price * line.quantity,
+      status: "Nuevo",
+      createdAt: "Portal · ahora",
+      stockCommitted: false,
+    }));
+
+    const updated: TenantDemoState = { ...latest, customers, orders: [...newOrders, ...latest.orders] };
+    try {
+      window.localStorage.setItem(tenantStorageKey, JSON.stringify(updated));
+    } catch {
+      flash("No se pudo guardar el pedido en este dispositivo, pero se abrirá WhatsApp igual.");
+    }
+    setState(updated);
+    window.open(whatsappUrl, "_blank", "noreferrer");
+    setCart({});
+    setBuyerName("");
+    setBuyerPhone("");
+    setCartOpen(false);
+  }
 
   if (portal.slug !== slug) {
     return (
@@ -77,6 +131,7 @@ export function PublicStore({ slug }: { slug: string }) {
 
   return (
     <main className="public-store" style={{ "--store-accent": portal.accent } as CSSProperties}>
+      {notice && <div className="public-store-toast" role="status">{notice}</div>}
       <header className="public-store-header">
         <div className="public-store-logo">
           {portal.storeName}
@@ -161,9 +216,13 @@ export function PublicStore({ slug }: { slug: string }) {
             </div>
             <div className="public-store-cart-total"><span>Total del pedido</span><strong>{money.format(cartTotal)}</strong></div>
             {cartLines.length > 0 && (
-              <a className="public-store-checkout" href={`https://wa.me/${portal.whatsapp}?text=${message}`} target="_blank" rel="noreferrer">
-                Enviar pedido por WhatsApp
-              </a>
+              <div className="public-store-buyer-form">
+                <label>Tu nombre<input value={buyerName} onChange={(event) => setBuyerName(event.target.value)} placeholder="Nombre y apellido" /></label>
+                <label>Tu WhatsApp<input value={buyerPhone} onChange={(event) => setBuyerPhone(event.target.value)} placeholder="+54 9…" /></label>
+                <button type="button" className="public-store-checkout" onClick={checkout}>
+                  Enviar pedido por WhatsApp
+                </button>
+              </div>
             )}
           </div>
         </div>

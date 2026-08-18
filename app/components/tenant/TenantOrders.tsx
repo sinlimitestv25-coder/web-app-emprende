@@ -5,7 +5,7 @@
 import { useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import type { Order, OrderStatus, TenantDemoState } from "../../data/tenant-demo";
 
-const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 const statuses: OrderStatus[] = ["Nuevo", "Preparando", "Listo", "Entregado", "Cancelado"];
 
 export function TenantOrders({ state, setState, changeStatus, flash }: { state: TenantDemoState; setState: Dispatch<SetStateAction<TenantDemoState>>; changeStatus: (id: string, status: OrderStatus) => void; flash: (message: string) => void }) {

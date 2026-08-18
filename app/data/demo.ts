@@ -31,8 +31,8 @@ export const spaces: PlatformSpace[] = [
   {
     id: "NX-000001",
     name: "Luna Creativa",
-    owner: "Marina Suárez",
-    email: "marina@lunacreativa.com",
+    owner: "Natalia Martínez",
+    email: "natalia@lunacreativa.com",
     plan: "Equipo",
     status: "Activo",
     modules: ["Inventario", "Clientes", "Pedidos", "Finanzas", "Portal"],
@@ -79,14 +79,14 @@ export const spaces: PlatformSpace[] = [
 ];
 
 export const administrators = [
-  { id: "usr_01", name: "Marina Suárez", email: "marina@lunacreativa.com", space: "Luna Creativa", spaceId: "NX-000001", role: "Administradora", status: "Activo", lastAccess: "Hoy, 09:42" },
+  { id: "usr_01", name: "Natalia Martínez", email: "natalia@lunacreativa.com", space: "Luna Creativa", spaceId: "NX-000001", role: "Administradora", status: "Activo", lastAccess: "Hoy, 09:42" },
   { id: "usr_02", name: "Carla Méndez", email: "carla@pequenosdetalles.com", space: "Pequeños Detalles", spaceId: "NX-000002", role: "Administradora", status: "Activo", lastAccess: "Ayer, 18:16" },
   { id: "usr_03", name: "Sofía Rojas", email: "sofia@tintaymagia.com", space: "Tinta & Magia", spaceId: "NX-000003", role: "Administradora", status: "Invitado", lastAccess: "Todavía no ingresó" },
   { id: "usr_04", name: "Nicolás Vega", email: "nico@lunacreativa.com", space: "Luna Creativa", spaceId: "NX-000001", role: "Empleado", status: "Activo", lastAccess: "Hoy, 08:10" },
 ];
 
 export const platformEvents = [
-  { id: "evt_01", action: "Inicio de sesión", subject: "Marina Suárez", context: "Luna Creativa · NX-000001", time: "Hace 18 min", tone: "mint" },
+  { id: "evt_01", action: "Inicio de sesión", subject: "Natalia Martínez", context: "Luna Creativa · NX-000001", time: "Hace 18 min", tone: "mint" },
   { id: "evt_02", action: "Invitación enviada", subject: "Sofía Rojas", context: "Tinta & Magia · NX-000003", time: "Hace 2 h", tone: "lilac" },
   { id: "evt_03", action: "Módulos actualizados", subject: "Juan Martín", context: "Pequeños Detalles · NX-000002", time: "Ayer, 17:04", tone: "blue" },
   { id: "evt_04", action: "Espacio creado", subject: "Juan Martín", context: "Tinta & Magia · NX-000003", time: "12 ago, 14:22", tone: "coral" },

@@ -1,4 +1,4 @@
-# Nexo v0.4.1
+# Nexo v0.5
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -59,6 +59,16 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - límite de imagen subido a 2 MB, con compresión automática en el navegador cuando una foto lo supera;
 - botones del portal (Abrir, Copiar enlace, Enviar por WhatsApp, Guardar y publicar) con íconos y colores pasteles;
 - sistema de íconos del sidebar y de los módulos reemplazado por ilustraciones vectoriales propias.
+
+### Identidad, gráfico y pedidos del portal 0.5
+
+- logo del emprendimiento en el sidebar (chico en modo compacto, grande al expandir), editable desde Ajustes;
+- gráfico de venta vs. costo en el inicio, con los últimos pedidos;
+- categorías de producto editables desde Ajustes, ya no fijas en el modal;
+- clientes y proveedores en formato tabla, con botón directo de WhatsApp por fila;
+- los pedidos enviados por WhatsApp desde el portal público quedan cargados automáticamente en Pedidos;
+- moneda siempre con el signo `$` de Argentina, sin la sigla ARS;
+- ajustes visuales: recuadro para la descripción del producto, aviso emergente con ícono centrado, nombre de la administradora de la demostración actualizado.
 
 ## Configuración
 

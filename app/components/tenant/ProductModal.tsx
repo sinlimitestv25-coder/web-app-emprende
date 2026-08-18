@@ -35,6 +35,7 @@ export function ProductModal({
   form,
   setForm,
   editing,
+  categories,
   onClose,
   onSubmit,
   flash,
@@ -42,6 +43,7 @@ export function ProductModal({
   form: ProductFormState;
   setForm: (form: ProductFormState) => void;
   editing: boolean;
+  categories: string[];
   onClose: () => void;
   onSubmit: (event: FormEvent) => void;
   flash: (message: string) => void;
@@ -88,7 +90,7 @@ export function ProductModal({
         <div className="form-grid">
           <label>Nombre<input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Ej. Taza personalizada" /></label>
           <label>Código / SKU<input required value={form.sku} onChange={(event) => setForm({ ...form, sku: event.target.value })} placeholder="TAZ-001" /></label>
-          <label>Categoría<select value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}><option>Tazas</option><option>Vasos térmicos</option><option>Vinilos</option><option>Llaveros</option><option>Botellas</option><option>Otros</option></select></label>
+          <label>Categoría<select value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
           <label>Variante<input required value={form.variant} onChange={(event) => setForm({ ...form, variant: event.target.value })} placeholder="Material, tamaño o diseño" /></label>
           <label>Stock actual<input required min="0" type="number" value={form.stock} onChange={(event) => setForm({ ...form, stock: event.target.value })} /></label>
           <label>Alerta mínima<input required min="0" type="number" value={form.minStock} onChange={(event) => setForm({ ...form, minStock: event.target.value })} /></label>

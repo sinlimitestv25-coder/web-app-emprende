@@ -8,7 +8,7 @@ import { ProductModal, emptyProductForm, type ProductFormState } from "./Product
 import { prepareImage } from "../../lib/image";
 import { AppIcon } from "../ui/AppIcon";
 
-const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 
 export function TenantPortal({ state, setState, flash }: { state: TenantDemoState; setState: Dispatch<SetStateAction<TenantDemoState>>; flash: (message: string) => void }) {
   const [draft, setDraft] = useState<PortalSettings>(state.portal);
@@ -154,6 +154,6 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
       <div className="portal-automation-note"><span>✓</span><div><strong>Catálogo conectado al inventario</strong><p>Un producto sin stock se oculta solo; al reponerlo lo volvés a publicar desde acá.</p></div></div>
     </section>
 
-    {productModalOpen && <ProductModal form={productForm} setForm={setProductForm} editing={editingProductId !== null} onClose={() => setProductModalOpen(false)} onSubmit={saveProduct} flash={flash} />}
+    {productModalOpen && <ProductModal form={productForm} setForm={setProductForm} editing={editingProductId !== null} categories={state.categories} onClose={() => setProductModalOpen(false)} onSubmit={saveProduct} flash={flash} />}
   </div>;
 }

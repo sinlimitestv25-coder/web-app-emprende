@@ -56,6 +56,7 @@ export type PortalSettings = {
   accent: string;
   published: boolean;
   bannerImages: string[];
+  logo: string;
 };
 
 export type TenantDemoState = {
@@ -64,6 +65,7 @@ export type TenantDemoState = {
   suppliers: Supplier[];
   orders: Order[];
   portal: PortalSettings;
+  categories: string[];
 };
 
 export const tenantStorageKey = "nexo-v0.3-luna-creativa";
@@ -112,5 +114,7 @@ export const defaultTenantDemo: TenantDemoState = {
     accent: "#e7674e",
     published: true,
     bannerImages: [],
+    logo: "",
   },
+  categories: ["Tazas", "Vasos térmicos", "Vinilos", "Llaveros", "Botellas", "Otros"],
 };
