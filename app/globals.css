@@ -394,6 +394,7 @@ button { color: inherit; }
 .public-store-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
 
 /* Nexo v0.4.2 · Ajustes: logo, banner y categorías */
+.settings-logo-upload { padding:0 22px 22px; }
 .settings-logo-upload .image-upload-preview,.settings-logo-upload .image-upload-placeholder { width:96px; height:96px; }
 .category-manager { padding:0 22px 22px; }
 .category-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
