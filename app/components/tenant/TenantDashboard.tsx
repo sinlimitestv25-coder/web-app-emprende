@@ -1,22 +1,29 @@
 "use client";
 
-import type { TenantDemoState, TenantNavId } from "../../data/tenant-demo";
+import type { Order, TenantDemoState, TenantNavId } from "../../data/tenant-demo";
 import { AppIcon } from "../ui/AppIcon";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 
+function orderCost(order: Order, state: TenantDemoState) {
+  return order.items.reduce((total, item) => total + (state.products.find((product) => product.id === item.productId)?.cost ?? 0) * item.quantity, 0);
+}
+
+function orderSummary(order: Order) {
+  if (order.items.length === 0) return "Sin productos";
+  if (order.items.length === 1) return `${order.items[0].productName} × ${order.items[0].quantity}`;
+  return `${order.items.length} productos`;
+}
+
 export function TenantDashboard({ state, onNavigate }: { state: TenantDemoState; onNavigate: (id: TenantNavId) => void }) {
   const delivered = state.orders.filter((order) => order.status === "Entregado");
   const sales = delivered.reduce((total, order) => total + order.total, 0);
-  const estimatedCost = delivered.reduce((total, order) => total + (state.products.find((product) => product.id === order.productId)?.cost ?? 0) * order.quantity, 0);
+  const estimatedCost = delivered.reduce((total, order) => total + orderCost(order, state), 0);
   const lowStock = state.products.filter((product) => product.stock <= product.minStock);
   const openOrders = state.orders.filter((order) => !["Entregado", "Cancelado"].includes(order.status));
 
   const chartOrders = state.orders.slice(0, 6).slice().reverse();
-  const chartBars = chartOrders.map((order) => ({
-    order,
-    cost: (state.products.find((product) => product.id === order.productId)?.cost ?? 0) * order.quantity,
-  }));
+  const chartBars = chartOrders.map((order) => ({ order, cost: orderCost(order, state) }));
   const chartMax = Math.max(1, ...chartBars.flatMap(({ order, cost }) => [order.total, cost]));
   const yLabels = [1, 0.75, 0.5, 0.25, 0].map((fraction) => money.format(Math.round((chartMax * fraction) / 100) * 100));
 
@@ -54,7 +61,7 @@ export function TenantDashboard({ state, onNavigate }: { state: TenantDemoState;
       ) : <div className="empty-state">Todavía no hay pedidos para graficar.</div>}
     </section>
     <div className="dashboard-grid tenant-dashboard-grid">
-      <section className="panel"><div className="panel-title"><div><h2>Pedidos recientes</h2><p>Seguimiento rápido de la preparación y entrega.</p></div><button className="link-button" onClick={() => onNavigate("pedidos")}>Ver todos →</button></div><div className="compact-list">{state.orders.slice(0, 4).map((order) => <article className="compact-row" key={order.id}><span className="order-code">{order.id}</span><div><strong>{order.customerName}</strong><small>{order.productName} × {order.quantity}</small></div><b>{money.format(order.total)}</b><span className={`status status-${order.status.toLowerCase()}`}>{order.status}</span></article>)}</div></section>
+      <section className="panel"><div className="panel-title"><div><h2>Pedidos recientes</h2><p>Seguimiento rápido de la preparación y entrega.</p></div><button className="link-button" onClick={() => onNavigate("pedidos")}>Ver todos →</button></div><div className="compact-list">{state.orders.slice(0, 4).map((order) => <article className="compact-row" key={order.id}><span className="order-code">{order.id}</span><div><strong>{order.customerName}</strong><small>{orderSummary(order)}</small></div><b>{money.format(order.total)}</b><span className={`status status-${order.status.toLowerCase()}`}>{order.status}</span></article>)}</div></section>
       <section className="panel"><div className="panel-title"><div><h2>Atención de stock</h2><p>Productos en el mínimo configurado o sin unidades.</p></div><button className="link-button" onClick={() => onNavigate("inventario")}>Gestionar →</button></div><div className="compact-list">{lowStock.map((product) => <article className="stock-alert-row" key={product.id}><span className={product.stock === 0 ? "stock-dot empty" : "stock-dot"}>{product.stock}</span><div><strong>{product.name}</strong><small>Mínimo configurado: {product.minStock}</small></div><span className={product.stock === 0 ? "status danger" : "status neutral"}>{product.stock === 0 ? "Sin stock" : "Stock bajo"}</span></article>)}{lowStock.length === 0 && <div className="empty-state">No hay alertas de stock.</div>}</div></section>
     </div>
     <div className="quick-actions tenant-quick-actions"><button onClick={() => onNavigate("inventario")}><span><AppIcon name="inventory" /></span><div><strong>Cargar producto</strong><small>Sumá un artículo o una nueva variante</small></div><b>→</b></button><button onClick={() => onNavigate("clientes")}><span><AppIcon name="customers" /></span><div><strong>Agendar cliente</strong><small>Guardá sus datos y preferencias</small></div><b>→</b></button><button onClick={() => onNavigate("portal")}><span><AppIcon name="portal" /></span><div><strong>Editar vidriera</strong><small>Actualizá el banner y los productos</small></div><b>→</b></button></div>

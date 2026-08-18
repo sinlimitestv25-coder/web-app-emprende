@@ -33,14 +33,18 @@ export type Supplier = {
 
 export type OrderStatus = "Nuevo" | "Preparando" | "Listo" | "Entregado" | "Cancelado";
 
-export type Order = {
-  id: string;
-  customerId: string;
-  customerName: string;
+export type OrderItem = {
   productId: string;
   productName: string;
   quantity: number;
   unitPrice: number;
+};
+
+export type Order = {
+  id: string;
+  customerId: string;
+  customerName: string;
+  items: OrderItem[];
   total: number;
   status: OrderStatus;
   createdAt: string;
@@ -100,10 +104,10 @@ export const defaultTenantDemo: TenantDemoState = {
     { id: "pro_03", name: "Importadora Central", contact: "Andrea Ruiz", phone: "+54 9 11 5501-7730", supplies: "Vasos térmicos y botellas" },
   ],
   orders: [
-    { id: "PED-1048", customerId: "cli_01", customerName: "Camila Torres", productId: "prd_01", productName: "Taza Dragon Ball", quantity: 2, unitPrice: 12500, total: 25000, status: "Nuevo", createdAt: "Hoy, 10:24", stockCommitted: false },
-    { id: "PED-1047", customerId: "cli_02", customerName: "Rocío Benítez", productId: "prd_04", productName: "Vinilo nombre personalizado", quantity: 3, unitPrice: 7200, total: 21600, status: "Preparando", createdAt: "Hoy, 09:12", stockCommitted: true },
-    { id: "PED-1046", customerId: "cli_04", customerName: "Diego Acosta", productId: "prd_06", productName: "Botella infantil Disney", quantity: 1, unitPrice: 18900, total: 18900, status: "Listo", createdAt: "Ayer, 18:40", stockCommitted: true },
-    { id: "PED-1045", customerId: "cli_03", customerName: "Valentina López", productId: "prd_03", productName: "Llavero Stitch", quantity: 2, unitPrice: 4800, total: 9600, status: "Entregado", createdAt: "12 ago, 16:05", stockCommitted: true },
+    { id: "PED-1048", customerId: "cli_01", customerName: "Camila Torres", items: [{ productId: "prd_01", productName: "Taza Dragon Ball", quantity: 2, unitPrice: 12500 }, { productId: "prd_03", productName: "Llavero Stitch", quantity: 1, unitPrice: 4800 }], total: 29800, status: "Nuevo", createdAt: "Hoy, 10:24", stockCommitted: false },
+    { id: "PED-1047", customerId: "cli_02", customerName: "Rocío Benítez", items: [{ productId: "prd_04", productName: "Vinilo nombre personalizado", quantity: 3, unitPrice: 7200 }], total: 21600, status: "Preparando", createdAt: "Hoy, 09:12", stockCommitted: true },
+    { id: "PED-1046", customerId: "cli_04", customerName: "Diego Acosta", items: [{ productId: "prd_06", productName: "Botella infantil Disney", quantity: 1, unitPrice: 18900 }], total: 18900, status: "Listo", createdAt: "Ayer, 18:40", stockCommitted: true },
+    { id: "PED-1045", customerId: "cli_03", customerName: "Valentina López", items: [{ productId: "prd_03", productName: "Llavero Stitch", quantity: 2, unitPrice: 4800 }], total: 9600, status: "Entregado", createdAt: "12 ago, 16:05", stockCommitted: true },
   ],
   portal: {
     slug: "luna-creativa",

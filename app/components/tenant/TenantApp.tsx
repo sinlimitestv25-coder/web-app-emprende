@@ -56,17 +56,28 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
       let products = current.products;
       let committed = order.stockCommitted;
       if (!committed && ["Preparando", "Listo", "Entregado"].includes(nextStatus)) {
-        const product = products.find((item) => item.id === order.productId);
-        if (!product || product.stock < order.quantity) {
+        const insufficient = order.items.find((line) => {
+          const product = products.find((item) => item.id === line.productId);
+          return !product || product.stock < line.quantity;
+        });
+        if (insufficient) {
           result = "No hay stock suficiente para preparar este pedido.";
           return current;
         }
-        products = products.map((item) => item.id === order.productId ? { ...item, stock: item.stock - order.quantity, published: item.stock - order.quantity > 0 && item.published } : item);
+        products = products.map((product) => {
+          const line = order.items.find((item) => item.productId === product.id);
+          if (!line) return product;
+          const stock = product.stock - line.quantity;
+          return { ...product, stock, published: stock > 0 && product.published };
+        });
         committed = true;
         result = "Pedido en preparación: el stock quedó descontado.";
       }
       if (committed && nextStatus === "Cancelado") {
-        products = products.map((item) => item.id === order.productId ? { ...item, stock: item.stock + order.quantity } : item);
+        products = products.map((product) => {
+          const line = order.items.find((item) => item.productId === product.id);
+          return line ? { ...product, stock: product.stock + line.quantity } : product;
+        });
         committed = false;
         result = "Pedido cancelado: el stock fue reintegrado.";
       }

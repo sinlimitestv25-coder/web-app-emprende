@@ -77,21 +77,18 @@ export function PublicStore({ slug }: { slug: string }) {
     const customer = existing ?? { id: `cli_${Date.now()}`, name: buyerName.trim(), phone: buyerPhone.trim(), email: "", notes: "Pedido realizado desde el portal." };
     const customers = existing ? latest.customers : [customer, ...latest.customers];
 
-    const newOrders: Order[] = cartLines.map((line, index) => ({
-      id: `PED-${1049 + latest.orders.length + index}`,
+    const newOrder: Order = {
+      id: `PED-${1049 + latest.orders.length}`,
       customerId: customer.id,
       customerName: customer.name,
-      productId: line.id,
-      productName: line.name,
-      quantity: line.quantity,
-      unitPrice: line.price,
-      total: line.price * line.quantity,
+      items: cartLines.map((line) => ({ productId: line.id, productName: line.name, quantity: line.quantity, unitPrice: line.price })),
+      total: cartTotal,
       status: "Nuevo",
       createdAt: "Portal · ahora",
       stockCommitted: false,
-    }));
+    };
 
-    const updated: TenantDemoState = { ...latest, customers, orders: [...newOrders, ...latest.orders] };
+    const updated: TenantDemoState = { ...latest, customers, orders: [newOrder, ...latest.orders] };
     try {
       window.localStorage.setItem(tenantStorageKey, JSON.stringify(updated));
     } catch {

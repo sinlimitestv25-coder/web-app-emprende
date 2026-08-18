@@ -24,6 +24,10 @@ const shapes: Record<string, ReactNode> = {
   check: <><circle cx="12" cy="12" r="8.5" /><path d="m8 12.3 2.6 2.6L16.5 9" /></>,
   edit: <><path d="M4 20 5 15.5 15.5 5l3.5 3.5L8.5 19 4 20Z" /><path d="M13.5 6.5 17.5 10.5" /></>,
   delete: <><path d="M5 7h14" /><path d="M9 7V4.5h6V7" /><path d="M7 7l1 13h8l1-13Z" /><path d="M10 11v6M14 11v6" /></>,
+  new: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5v9M7.5 12h9" /></>,
+  clock: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7v5l3.5 2" /></>,
+  ready: <><rect x="4" y="4" width="16" height="16" rx="3" /><path d="m8 12.3 2.6 2.6L16.5 9" /></>,
+  cancel: <><circle cx="12" cy="12" r="8.5" /><path d="m9 9 6 6M15 9l-6 6" /></>,
 };
 
 export function AppIcon({ name, className = "", label }: { name: string; className?: string; label?: string }) {
