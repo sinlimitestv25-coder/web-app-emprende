@@ -1,4 +1,4 @@
-# Nexo v0.5
+# Nexo v0.6.3
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -69,6 +69,34 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - los pedidos enviados por WhatsApp desde el portal público quedan cargados automáticamente en Pedidos;
 - moneda siempre con el signo `$` de Argentina, sin la sigla ARS;
 - ajustes visuales: recuadro para la descripción del producto, aviso emergente con ícono centrado, nombre de la administradora de la demostración actualizado.
+
+### Correcciones de uso en celular 0.5.1
+
+- clientes y proveedores: botones de editar y borrar, además del de WhatsApp;
+- tabla de clientes y proveedores con scroll horizontal en celular, igual que pedidos e inventario;
+- pedidos: botón "Todos" explícito para volver a ver todo el listado sin adivinar el clic.
+
+### Pedidos con varios productos 0.6
+
+- un pedido ahora puede tener varios productos (antes cada producto generaba un pedido aparte);
+- los pedidos que llegan por WhatsApp desde el portal se cargan como un solo pedido con todos los productos del carrito;
+- modal "Ver detalle" para pedidos con más de un producto;
+- pipeline de estados de Pedidos con ícono propio por estado (nuevo, preparando, listo, entregado, cancelado);
+- botón de WhatsApp de Pedidos unificado con el mismo ícono y color que Clientes y Proveedores.
+
+### Corrección urgente 0.6.1
+
+- se arregló una pantalla en blanco al entrar al emprendimiento: los pedidos guardados en versiones anteriores a 0.6 no tenían el nuevo campo `items` y rompían el inicio; ahora se adaptan solos al formato nuevo sin perder datos.
+
+### Corrección visual 0.6.2
+
+- el recuadro para subir el logo en Ajustes quedaba pegado abajo a la izquierda del panel; ahora tiene el mismo margen que el resto de las secciones.
+
+### Sidebar 0.6.3
+
+- botón "Salir" más grande y visible, con ícono, en el panel del emprendimiento y en superadministración;
+- se sacó la flechita sin función junto al nombre del emprendimiento;
+- el logo del emprendimiento pasa a ocupar todo el ancho del sidebar cuando se expande (antes solo se agrandaba como cuadrado).
 
 ## Configuración
 

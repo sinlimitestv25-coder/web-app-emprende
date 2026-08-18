@@ -83,7 +83,7 @@ export function AppShell() {
 
         <div className="sidebar-footer">
           <div className="mini-profile"><span className="avatar avatar-dark">JM</span><span className="sidebar-copy"><strong>Juan Martín</strong><small>Superadministrador</small></span></div>
-          <button className="dots" onClick={signOut} aria-label="Cerrar sesión">Salir</button>
+          <button className="dots" onClick={signOut} aria-label="Cerrar sesión" title="Cerrar sesión"><AppIcon name="logout" /><span className="sidebar-copy">Salir</span></button>
         </div>
       </aside>
 

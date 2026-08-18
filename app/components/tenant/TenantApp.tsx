@@ -97,7 +97,7 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""} ${sidebarPinned ? "sidebar-pinned" : ""}`}>
         <button className="brand" onClick={() => navigate("inicio")} aria-label="Ir al inicio"><span className="brand-mark">N</span><span className="sidebar-copy"><strong>Nexo</strong><small>gestión de negocio</small></span></button>
         <button className="sidebar-pin" type="button" onClick={() => setSidebarPinned((current) => !current)} aria-label={sidebarPinned ? "Desfijar menú lateral" : "Fijar menú lateral"} title={sidebarPinned ? "Dejar menú compacto" : "Mantener menú abierto"}>{sidebarPinned ? "‹" : "›"}</button>
-        <div className="workspace-switcher">{state.portal.logo ? <img src={state.portal.logo} alt="" className="workspace-logo" /> : <span className="avatar avatar-coral">{state.portal.storeName.split(" ").map((word) => word[0]).slice(0, 2).join("")}</span>}<span className="sidebar-copy"><small>Mi emprendimiento</small><strong>{state.portal.storeName}</strong></span><span className="chevron">⌄</span></div>
+        <div className="workspace-switcher">{state.portal.logo ? <img src={state.portal.logo} alt="" className="workspace-logo" /> : <span className="avatar avatar-coral">{state.portal.storeName.split(" ").map((word) => word[0]).slice(0, 2).join("")}</span>}<span className="sidebar-copy"><small>Mi emprendimiento</small><strong>{state.portal.storeName}</strong></span></div>
         <nav aria-label="Navegación del emprendimiento">
           <p className="nav-label">Gestión</p>
           {tenantNavItems.map((item) => <button key={item.id} className={active === item.id ? "nav-item active" : "nav-item"} onClick={() => navigate(item.id)} aria-current={active === item.id ? "page" : undefined} title={item.label}><span className="nav-glyph"><AppIcon name={item.glyph} /></span><span className="nav-text">{item.label}</span>{item.id === "pedidos" && <span className="nav-count">{state.orders.filter((order) => order.status === "Nuevo").length}</span>}{item.id === "inventario" && lowStock > 0 && <span className="nav-alert">{lowStock}</span>}</button>)}
@@ -105,7 +105,7 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
           <button className={active === "ajustes" ? "nav-item active" : "nav-item"} onClick={() => navigate("ajustes")} aria-current={active === "ajustes" ? "page" : undefined} title="Ajustes"><span className="nav-glyph"><AppIcon name="settings" /></span><span className="nav-text">Ajustes</span></button>
         </nav>
         <div className="tenant-demo-note"><strong>Demostración v0.3</strong><span>Los cambios se guardan solamente en este dispositivo.</span></div>
-        <div className="sidebar-footer"><div className="mini-profile"><span className="avatar avatar-dark">NM</span><span className="sidebar-copy"><strong>Natalia Martínez</strong><small>Administradora</small></span></div><button className="dots" onClick={onExit}>Salir</button></div>
+        <div className="sidebar-footer"><div className="mini-profile"><span className="avatar avatar-dark">NM</span><span className="sidebar-copy"><strong>Natalia Martínez</strong><small>Administradora</small></span></div><button className="dots" onClick={onExit} aria-label="Cerrar sesión" title="Cerrar sesión"><AppIcon name="logout" /><span className="sidebar-copy">Salir</span></button></div>
       </aside>
       {menuOpen && <button className="scrim" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú" />}
       <main className="main">

@@ -28,6 +28,7 @@ const shapes: Record<string, ReactNode> = {
   clock: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7v5l3.5 2" /></>,
   ready: <><rect x="4" y="4" width="16" height="16" rx="3" /><path d="m8 12.3 2.6 2.6L16.5 9" /></>,
   cancel: <><circle cx="12" cy="12" r="8.5" /><path d="m9 9 6 6M15 9l-6 6" /></>,
+  logout: <><path d="M9 4H5v14h4" /><path d="M20 12H9" /><path d="m15 7 5 5-5 5" /></>,
 };
 
 export function AppIcon({ name, className = "", label }: { name: string; className?: string; label?: string }) {
