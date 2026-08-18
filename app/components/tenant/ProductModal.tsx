@@ -3,6 +3,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/label-has-associated-control -- modal backdrop is an optional pointer shortcut with a keyboard-accessible close button; the outer image label wraps a nested label+input for the file picker */
 
 import type { ChangeEvent, FormEvent } from "react";
+import { prepareImage } from "../../lib/image";
 
 export type ProductFormState = {
   name: string;
@@ -30,8 +31,6 @@ export const emptyProductForm: ProductFormState = {
   cost: "",
 };
 
-const maxImageBytes = 1_500_000;
-
 export function ProductModal({
   form,
   setForm,
@@ -47,16 +46,19 @@ export function ProductModal({
   onSubmit: (event: FormEvent) => void;
   flash: (message: string) => void;
 }) {
-  function handleImage(event: ChangeEvent<HTMLInputElement>) {
+  async function handleImage(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    if (!file.type.startsWith("image/")) { flash("Elegí un archivo de imagen."); return; }
-    if (file.size > maxImageBytes) { flash("La imagen es muy pesada. Usá una de hasta 1,5 MB."); return; }
-    const reader = new FileReader();
-    reader.onload = () => setForm({ ...form, image: String(reader.result) });
-    reader.onerror = () => flash("No se pudo leer la imagen.");
-    reader.readAsDataURL(file);
+    const result = await prepareImage(file);
+    if (!result.ok) {
+      if (result.reason === "not-image") flash("Elegí un archivo de imagen.");
+      else if (result.reason === "too-large") flash("Esta imagen pesa demasiado incluso comprimida. Probá con otra.");
+      else flash("No se pudo leer la imagen.");
+      return;
+    }
+    setForm({ ...form, image: result.dataUrl });
+    if (result.compressed) flash("La imagen pesaba de más: se comprimió automáticamente para poder subirla.");
   }
 
   return (

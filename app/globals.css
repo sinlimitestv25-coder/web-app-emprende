@@ -338,8 +338,16 @@ button { color: inherit; }
 .portal-link-label { display:block; color:var(--muted); font-size:11px; font-weight:650; text-transform:uppercase; letter-spacing:.6px; }
 .portal-link-url { display:block; margin-top:6px; font-size:16px; font-weight:650; word-break:break-all; }
 .portal-link-buttons { display:flex; flex-wrap:wrap; gap:10px; }
+.portal-link-buttons .button,.button.whatsapp-share,.tenant-portal-page .page-heading .button.primary { display:inline-flex; align-items:center; gap:8px; }
 .portal-link-buttons .button { padding:13px 20px; font-size:13px; }
-.button.whatsapp-share { border:0; color:white; background:#25d366; }
+.portal-link-buttons .button.primary { color:#2f5f7a; border-color:#c3dbe8; background:#dceaf2; box-shadow:none; }
+.portal-link-buttons .button.primary:hover { background:#cbe0ec; color:#254c63; transform:translateY(-1px); }
+.portal-link-buttons .button.secondary { color:#705888; border-color:#ddd0ec; background:#e9e1f2; }
+.portal-link-buttons .button.secondary:hover { background:#ded0ec; }
+.button.whatsapp-share { border:0; color:#1f6a4c; background:#d9eee5; }
+.button.whatsapp-share:hover { background:#c7e5d7; }
+.tenant-portal-page .page-heading .button.primary { color:#9d4838; border-color:#f0c2b4; background:#f8d9d2; box-shadow:none; }
+.tenant-portal-page .page-heading .button.primary:hover { background:#f3c6b8; transform:translateY(-1px); }
 
 .portal-settings-grid { margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
 @media (max-width:1024px) { .portal-settings-grid { grid-template-columns:1fr; } }

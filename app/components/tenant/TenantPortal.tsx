@@ -5,9 +5,10 @@
 import { useState, type ChangeEvent, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import type { PortalSettings, Product, TenantDemoState } from "../../data/tenant-demo";
 import { ProductModal, emptyProductForm, type ProductFormState } from "./ProductModal";
+import { prepareImage } from "../../lib/image";
+import { AppIcon } from "../ui/AppIcon";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
-const maxImageBytes = 1_500_000;
 
 export function TenantPortal({ state, setState, flash }: { state: TenantDemoState; setState: Dispatch<SetStateAction<TenantDemoState>>; flash: (message: string) => void }) {
   const [draft, setDraft] = useState<PortalSettings>(state.portal);
@@ -41,16 +42,19 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
     window.open(`https://wa.me/?text=${text}`, "_blank", "noreferrer");
   }
 
-  function addBannerImage(event: ChangeEvent<HTMLInputElement>) {
+  async function addBannerImage(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    if (!file.type.startsWith("image/")) { flash("Elegí un archivo de imagen."); return; }
-    if (file.size > maxImageBytes) { flash("La imagen es muy pesada. Usá una de hasta 1,5 MB."); return; }
-    const reader = new FileReader();
-    reader.onload = () => setDraft((current) => ({ ...current, bannerImages: [...current.bannerImages, String(reader.result)] }));
-    reader.onerror = () => flash("No se pudo leer la imagen.");
-    reader.readAsDataURL(file);
+    const result = await prepareImage(file);
+    if (!result.ok) {
+      if (result.reason === "not-image") flash("Elegí un archivo de imagen.");
+      else if (result.reason === "too-large") flash("Esta imagen pesa demasiado incluso comprimida. Probá con otra.");
+      else flash("No se pudo leer la imagen.");
+      return;
+    }
+    setDraft((current) => ({ ...current, bannerImages: [...current.bannerImages, result.dataUrl] }));
+    if (result.compressed) flash("La imagen pesaba de más: se comprimió automáticamente para poder subirla.");
   }
 
   function removeBannerImage(index: number) {
@@ -79,8 +83,8 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
     flash(product.published ? "Producto ocultado del portal." : "Producto publicado en el portal.");
   }
 
-  return <>
-    <div className="page-heading"><div><p className="eyebrow">Vidriera online</p><h1>Portal de ventas</h1><p>Editá tu identidad, subí fotos de producto y compartí el enlace público.</p></div><div className="heading-actions"><span className={state.portal.published ? "status success" : "status neutral"}>{state.portal.published ? "Portal publicado" : "Portal en borrador"}</span><button className="button primary" onClick={save}>Guardar y publicar</button></div></div>
+  return <div className="tenant-portal-page">
+    <div className="page-heading"><div><p className="eyebrow">Vidriera online</p><h1>Portal de ventas</h1><p>Editá tu identidad, subí fotos de producto y compartí el enlace público.</p></div><div className="heading-actions"><span className={state.portal.published ? "status success" : "status neutral"}>{state.portal.published ? "Portal publicado" : "Portal en borrador"}</span><button className="button primary" onClick={save}><AppIcon name="check" /> Guardar y publicar</button></div></div>
 
     <section className="panel portal-link-panel">
       <div>
@@ -88,9 +92,9 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
         <strong className="portal-link-url">{publicUrl}</strong>
       </div>
       <div className="portal-link-buttons">
-        <a className="button primary" href={storePath} target="_blank" rel="noreferrer">Abrir portal</a>
-        <button type="button" className="button secondary" onClick={copyLink}>Copiar enlace</button>
-        <button type="button" className="button whatsapp-share" onClick={shareWhatsApp}>Enviar por WhatsApp</button>
+        <a className="button primary" href={storePath} target="_blank" rel="noreferrer"><AppIcon name="globe" /> Abrir portal</a>
+        <button type="button" className="button secondary" onClick={copyLink}><AppIcon name="copy" /> Copiar enlace</button>
+        <button type="button" className="button whatsapp-share" onClick={shareWhatsApp}><AppIcon name="whatsapp" /> Enviar por WhatsApp</button>
       </div>
     </section>
 
@@ -151,5 +155,5 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
     </section>
 
     {productModalOpen && <ProductModal form={productForm} setForm={setProductForm} editing={editingProductId !== null} onClose={() => setProductModalOpen(false)} onSubmit={saveProduct} flash={flash} />}
-  </>;
+  </div>;
 }
