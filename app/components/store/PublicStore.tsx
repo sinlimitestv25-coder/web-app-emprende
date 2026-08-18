@@ -3,7 +3,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions -- modal backdrop is only a pointer shortcut, closable by its own button */
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { defaultTenantDemo, migrateOrders, tenantStorageKey, type Order, type TenantDemoState } from "../../data/tenant-demo";
+import { defaultTenantDemo, migrateBanners, migrateCategories, migrateOrders, tenantStorageKey, type Banner, type Order, type TenantDemoState } from "../../data/tenant-demo";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 const slideIntervalMs = 5000;
@@ -16,31 +16,51 @@ export function PublicStore({ slug }: { slug: string }) {
   const [buyerName, setBuyerName] = useState("");
   const [buyerPhone, setBuyerPhone] = useState("");
   const [notice, setNotice] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     const saved = window.localStorage.getItem(tenantStorageKey);
     if (!saved) return;
     try {
       const parsed = JSON.parse(saved) as TenantDemoState;
-      setState({ ...parsed, portal: { ...defaultTenantDemo.portal, ...parsed.portal }, categories: parsed.categories?.length ? parsed.categories : defaultTenantDemo.categories, orders: migrateOrders(parsed.orders) });
+      setState({
+        ...parsed,
+        portal: { ...defaultTenantDemo.portal, ...parsed.portal, banners: migrateBanners(parsed.portal) },
+        categories: parsed.categories?.length ? migrateCategories(parsed.categories) : defaultTenantDemo.categories,
+        orders: migrateOrders(parsed.orders),
+      });
     } catch {
       /* datos de prueba corruptos: se ignoran */
     }
   }, []);
 
   const { portal, products } = state;
+  const banners = portal.banners;
   const published = useMemo(() => products.filter((product) => product.published && product.stock > 0), [products]);
+  const filtered = useMemo(() => published.filter((product) => {
+    if (categoryFilter && product.category !== categoryFilter) return false;
+    if (!searchText.trim()) return true;
+    const haystack = `${product.name} ${product.description} ${product.category} ${product.subcategory ?? ""}`.toLowerCase();
+    return haystack.includes(searchText.trim().toLowerCase());
+  }), [published, categoryFilter, searchText]);
   const cartLines = useMemo(() => published.filter((product) => cart[product.id]).map((product) => ({ ...product, quantity: cart[product.id] })), [cart, published]);
   const cartTotal = cartLines.reduce((total, line) => total + line.price * line.quantity, 0);
   const cartCount = Object.values(cart).reduce((total, quantity) => total + quantity, 0);
-  const bannerImages = portal.bannerImages;
 
   useEffect(() => {
     setSlide(0);
-    if (bannerImages.length < 2) return;
-    const timer = window.setInterval(() => setSlide((current) => (current + 1) % bannerImages.length), slideIntervalMs);
+    if (banners.length < 2) return;
+    const timer = window.setInterval(() => setSlide((current) => (current + 1) % banners.length), slideIntervalMs);
     return () => window.clearInterval(timer);
-  }, [bannerImages.length]);
+  }, [banners.length]);
+
+  function openBanner(banner: Banner) {
+    if (banner.linkType === "category") { setCategoryFilter(banner.linkValue); setSearchText(""); }
+    else if (banner.linkType === "subcategory" || banner.linkType === "keyword") { setCategoryFilter(""); setSearchText(banner.linkValue); }
+    else return;
+    document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
+  }
 
   function add(productId: string) {
     const product = published.find((item) => item.id === productId);
@@ -145,24 +165,24 @@ export function PublicStore({ slug }: { slug: string }) {
       </header>
 
       <section className="public-store-hero">
-        {bannerImages.length > 0 && (
+        {banners.length > 0 && (
           <div className="public-store-hero-slides">
-            {bannerImages.map((src, index) => (
-              <div key={index} className={index === slide ? "public-store-slide active" : "public-store-slide"} style={{ backgroundImage: `url(${src})` }} />
+            {banners.map((banner, index) => (
+              <div key={index} className={index === slide ? "public-store-slide active" : "public-store-slide"} style={{ backgroundImage: `url(${banner.image})` }} />
             ))}
           </div>
         )}
-        <div className="public-store-hero-content">
+        <div className={banners[slide] && banners[slide].linkType !== "none" ? "public-store-hero-content is-clickable" : "public-store-hero-content"} onClick={banners[slide] && banners[slide].linkType !== "none" ? () => openBanner(banners[slide]) : undefined}>
           <span className="public-store-eyebrow">Hecho especialmente para vos</span>
-          <h1>{portal.headline}</h1>
+          <h1>{banners[slide]?.title || portal.headline}</h1>
           <p>{portal.description}</p>
-          <button type="button" onClick={() => document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" })}>
+          <button type="button" onClick={(event) => { event.stopPropagation(); document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" }); }}>
             Ver productos
           </button>
         </div>
-        {bannerImages.length > 1 && (
+        {banners.length > 1 && (
           <div className="public-store-hero-dots">
-            {bannerImages.map((_, index) => (
+            {banners.map((_, index) => (
               <button key={index} type="button" className={index === slide ? "active" : ""} aria-label={`Ir a la imagen ${index + 1}`} onClick={() => setSlide(index)} />
             ))}
           </div>
@@ -175,10 +195,19 @@ export function PublicStore({ slug }: { slug: string }) {
             <span className="public-store-eyebrow">Catálogo</span>
             <h2>Elegí tu próximo regalo</h2>
           </div>
-          <small>{published.length} productos disponibles</small>
+          <small>{filtered.length} productos disponibles</small>
+        </div>
+        <div className="public-store-filters">
+          <div className="public-store-category-chips">
+            <button type="button" className={!categoryFilter ? "active" : ""} onClick={() => setCategoryFilter("")}>Todos</button>
+            {state.categories.map((category) => (
+              <button key={category.name} type="button" className={categoryFilter === category.name ? "active" : ""} onClick={() => setCategoryFilter(category.name)}>{category.name}</button>
+            ))}
+          </div>
+          <input className="public-store-search" value={searchText} onChange={(event) => setSearchText(event.target.value)} placeholder="Buscar por material, tema, nombre…" />
         </div>
         <div className="public-store-grid">
-          {published.map((product, index) => (
+          {filtered.map((product, index) => (
             <article key={product.id} className={`public-store-card tone-${index % 4}`}>
               <div className="public-store-thumb">
                 {product.image ? <img src={product.image} alt={product.name} /> : <span>{product.category.slice(0, 1)}</span>}
@@ -193,6 +222,7 @@ export function PublicStore({ slug }: { slug: string }) {
             </article>
           ))}
           {published.length === 0 && <p className="public-store-empty">Todavía no hay productos publicados.</p>}
+          {published.length > 0 && filtered.length === 0 && <p className="public-store-empty">No encontramos productos con ese filtro.</p>}
         </div>
       </section>
 

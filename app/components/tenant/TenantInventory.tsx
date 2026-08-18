@@ -3,13 +3,13 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-element-interactions -- modal backdrop is an optional pointer shortcut; every modal also has a keyboard-accessible close button */
 
 import { useMemo, useState, type FormEvent } from "react";
-import type { Product } from "../../data/tenant-demo";
+import type { Category, Product } from "../../data/tenant-demo";
 import { AppIcon } from "../ui/AppIcon";
 import { ProductModal, emptyProductForm, type ProductFormState } from "./ProductModal";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 
-export function TenantInventory({ products, setProducts, categories, flash }: { products: Product[]; setProducts: (products: Product[]) => void; categories: string[]; flash: (message: string) => void }) {
+export function TenantInventory({ products, setProducts, categories, flash }: { products: Product[]; setProducts: (products: Product[]) => void; categories: Category[]; flash: (message: string) => void }) {
   const [search, setSearch] = useState("");
   const [lowOnly, setLowOnly] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -22,13 +22,13 @@ export function TenantInventory({ products, setProducts, categories, flash }: { 
 
   function openProduct(product?: Product) {
     setEditing(product?.id ?? null);
-    setForm(product ? { name: product.name, sku: product.sku, category: product.category, variant: product.variant, description: product.description ?? "", image: product.image ?? "", stock: String(product.stock), minStock: String(product.minStock), price: String(product.price), cost: String(product.cost) } : emptyProductForm);
+    setForm(product ? { name: product.name, sku: product.sku, category: product.category, subcategory: product.subcategory ?? "", variant: product.variant, description: product.description ?? "", image: product.image ?? "", stock: String(product.stock), minStock: String(product.minStock), price: String(product.price), cost: String(product.cost) } : { ...emptyProductForm, category: categories[0]?.name ?? "" });
     setFormOpen(true);
   }
 
   function save(event: FormEvent) {
     event.preventDefault();
-    const item: Product = { id: editing ?? `prd_${Date.now()}`, name: form.name.trim(), sku: form.sku.trim().toUpperCase(), category: form.category, variant: form.variant.trim(), description: form.description.trim(), image: form.image, stock: Math.max(0, Number(form.stock)), minStock: Math.max(0, Number(form.minStock)), price: Math.max(0, Number(form.price)), cost: Math.max(0, Number(form.cost)), published: editing ? products.find((product) => product.id === editing)?.published ?? false : Number(form.stock) > 0 };
+    const item: Product = { id: editing ?? `prd_${Date.now()}`, name: form.name.trim(), sku: form.sku.trim().toUpperCase(), category: form.category, subcategory: form.subcategory, variant: form.variant.trim(), description: form.description.trim(), image: form.image, stock: Math.max(0, Number(form.stock)), minStock: Math.max(0, Number(form.minStock)), price: Math.max(0, Number(form.price)), cost: Math.max(0, Number(form.cost)), published: editing ? products.find((product) => product.id === editing)?.published ?? false : Number(form.stock) > 0 };
     setProducts(editing ? products.map((product) => product.id === editing ? item : product) : [item, ...products]);
     setFormOpen(false);
     flash(editing ? "Producto actualizado." : "Producto agregado al inventario.");

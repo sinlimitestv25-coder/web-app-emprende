@@ -1,4 +1,4 @@
-# Nexo v0.8.3
+# Nexo v0.9
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -136,6 +136,14 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - ícono de Nexo en el login con las puntas redondeadas;
 - "PLATAFORMA MULTITENANT" y el título subieron a la mitad de la altura del panel (antes quedaban pegados abajo), manteniendo la alineación a la izquierda;
 - el logo del emprendimiento en el sidebar expandido ya no se corta: pasó de recortarse para llenar el marco a mostrarse completo siempre, sin importar la forma del logo que se suba.
+
+### Categorías, buscador y banners con enlace 0.9
+
+- categorías con subcategorías (Categoría → Subcategoría), editables desde Ajustes junto con una lista de palabras clave por subcategoría;
+- al cargar la descripción de un producto, la subcategoría se sugiere sola si el texto menciona alguna palabra clave configurada (siempre editable a mano);
+- portal público: fila de categorías + buscador de texto libre que busca por nombre, descripción, categoría y subcategoría;
+- banners del carrusel con título propio por imagen y, opcionalmente, un enlace a una categoría, subcategoría o palabra clave — al hacer clic, el catálogo se filtra solo;
+- se sacó el editor de banners duplicado de Ajustes (quedó un solo lugar: Portal de ventas).
 
 ## Configuración
 

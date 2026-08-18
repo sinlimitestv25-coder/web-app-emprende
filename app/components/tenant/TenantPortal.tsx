@@ -3,7 +3,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control -- the hidden file input inside each label remains reachable and labelled by its wrapping label */
 
 import { useState, type ChangeEvent, type Dispatch, type FormEvent, type SetStateAction } from "react";
-import type { PortalSettings, Product, TenantDemoState } from "../../data/tenant-demo";
+import type { Banner, BannerLinkType, PortalSettings, Product, TenantDemoState } from "../../data/tenant-demo";
 import { ProductModal, emptyProductForm, type ProductFormState } from "./ProductModal";
 import { prepareImage } from "../../lib/image";
 import { AppIcon } from "../ui/AppIcon";
@@ -42,7 +42,7 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
     window.open(`https://wa.me/?text=${text}`, "_blank", "noreferrer");
   }
 
-  async function addBannerImage(event: ChangeEvent<HTMLInputElement>) {
+  async function addBanner(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
@@ -53,23 +53,28 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
       else flash("No se pudo leer la imagen.");
       return;
     }
-    setDraft((current) => ({ ...current, bannerImages: [...current.bannerImages, result.dataUrl] }));
+    const banner: Banner = { image: result.dataUrl, title: "", linkType: "none", linkValue: "" };
+    setDraft((current) => ({ ...current, banners: [...current.banners, banner] }));
     if (result.compressed) flash("La imagen pesaba de más: se comprimió automáticamente para poder subirla.");
   }
 
-  function removeBannerImage(index: number) {
-    setDraft((current) => ({ ...current, bannerImages: current.bannerImages.filter((_, itemIndex) => itemIndex !== index) }));
+  function removeBanner(index: number) {
+    setDraft((current) => ({ ...current, banners: current.banners.filter((_, itemIndex) => itemIndex !== index) }));
+  }
+
+  function updateBanner(index: number, patch: Partial<Banner>) {
+    setDraft((current) => ({ ...current, banners: current.banners.map((banner, itemIndex) => itemIndex === index ? { ...banner, ...patch } : banner) }));
   }
 
   function openProduct(product?: Product) {
     setEditingProductId(product?.id ?? null);
-    setProductForm(product ? { name: product.name, sku: product.sku, category: product.category, variant: product.variant, description: product.description ?? "", image: product.image ?? "", stock: String(product.stock), minStock: String(product.minStock), price: String(product.price), cost: String(product.cost) } : emptyProductForm);
+    setProductForm(product ? { name: product.name, sku: product.sku, category: product.category, subcategory: product.subcategory ?? "", variant: product.variant, description: product.description ?? "", image: product.image ?? "", stock: String(product.stock), minStock: String(product.minStock), price: String(product.price), cost: String(product.cost) } : { ...emptyProductForm, category: state.categories[0]?.name ?? "" });
     setProductModalOpen(true);
   }
 
   function saveProduct(event: FormEvent) {
     event.preventDefault();
-    const item: Product = { id: editingProductId ?? `prd_${Date.now()}`, name: productForm.name.trim(), sku: productForm.sku.trim().toUpperCase(), category: productForm.category, variant: productForm.variant.trim(), description: productForm.description.trim(), image: productForm.image, stock: Math.max(0, Number(productForm.stock)), minStock: Math.max(0, Number(productForm.minStock)), price: Math.max(0, Number(productForm.price)), cost: Math.max(0, Number(productForm.cost)), published: editingProductId ? state.products.find((product) => product.id === editingProductId)?.published ?? false : Number(productForm.stock) > 0 };
+    const item: Product = { id: editingProductId ?? `prd_${Date.now()}`, name: productForm.name.trim(), sku: productForm.sku.trim().toUpperCase(), category: productForm.category, subcategory: productForm.subcategory, variant: productForm.variant.trim(), description: productForm.description.trim(), image: productForm.image, stock: Math.max(0, Number(productForm.stock)), minStock: Math.max(0, Number(productForm.minStock)), price: Math.max(0, Number(productForm.price)), cost: Math.max(0, Number(productForm.cost)), published: editingProductId ? state.products.find((product) => product.id === editingProductId)?.published ?? false : Number(productForm.stock) > 0 };
     setState((current) => ({ ...current, products: editingProductId ? current.products.map((product) => product.id === editingProductId ? item : product) : [item, ...current.products] }));
     setProductModalOpen(false);
     flash(editingProductId ? "Producto actualizado." : "Producto agregado al catálogo.");
@@ -113,20 +118,27 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
       </section>
 
       <section className="panel">
-        <div className="panel-title"><div><h2>Imágenes del banner</h2><p>Forman un carrusel en la portada de tu tienda.</p></div></div>
+        <div className="panel-title"><div><h2>Imágenes del banner</h2><p>Forman un carrusel en la portada de tu tienda. Cada una puede tener su propio texto y, si querés, llevar a una categoría, subcategoría o palabra clave al hacer clic.</p></div></div>
         <div className="portal-banner-manager">
-          {draft.bannerImages.map((src, index) => (
-            <div className="portal-banner-item" key={index}>
-              <img src={src} alt="" />
-              <button type="button" onClick={() => removeBannerImage(index)} aria-label={`Quitar imagen ${index + 1}`}>×</button>
+          {draft.banners.map((banner, index) => (
+            <div className="portal-banner-card" key={index}>
+              <img src={banner.image} alt="" className="portal-banner-card-image" />
+              <div className="portal-banner-card-fields">
+                <label>Título<input value={banner.title} onChange={(event) => updateBanner(index, { title: event.target.value })} placeholder="Ej. Saiyans" /></label>
+                <label>Al hacer clic, mostrar<select value={banner.linkType} onChange={(event) => updateBanner(index, { linkType: event.target.value as BannerLinkType, linkValue: "" })}><option value="none">Nada (solo decorativo)</option><option value="category">Una categoría</option><option value="subcategory">Una subcategoría</option><option value="keyword">Una palabra clave</option></select></label>
+                {banner.linkType === "category" && <label>Categoría<select value={banner.linkValue} onChange={(event) => updateBanner(index, { linkValue: event.target.value })}><option value="">Elegir…</option>{state.categories.map((category) => <option key={category.name} value={category.name}>{category.name}</option>)}</select></label>}
+                {banner.linkType === "subcategory" && <label>Subcategoría<select value={banner.linkValue} onChange={(event) => updateBanner(index, { linkValue: event.target.value })}><option value="">Elegir…</option>{state.categories.flatMap((category) => category.subcategories).map((sub) => <option key={sub.name} value={sub.name}>{sub.name}</option>)}</select></label>}
+                {banner.linkType === "keyword" && <label>Palabra clave<input value={banner.linkValue} onChange={(event) => updateBanner(index, { linkValue: event.target.value })} placeholder="Ej. aluminio" /></label>}
+              </div>
+              <button type="button" className="portal-banner-card-remove" onClick={() => removeBanner(index)} aria-label={`Quitar imagen ${index + 1}`}>×</button>
             </div>
           ))}
           <label className="portal-banner-add">
             + Agregar imagen
-            <input type="file" accept="image/*" onChange={addBannerImage} hidden />
+            <input type="file" accept="image/*" onChange={addBanner} hidden />
           </label>
         </div>
-        {draft.bannerImages.length === 0 && <p className="portal-banner-empty">Todavía no subiste imágenes. Mientras tanto se muestra un fondo de color en el banner.</p>}
+        {draft.banners.length === 0 && <p className="portal-banner-empty">Todavía no subiste imágenes. Mientras tanto se muestra un fondo de color en el banner.</p>}
       </section>
     </div>
 

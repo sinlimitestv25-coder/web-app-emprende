@@ -411,6 +411,31 @@ button { color: inherit; }
 .category-chip button:hover { color:#a34737; }
 .category-add-form { display:flex; gap:10px; }
 .category-add-form input { flex:1; padding:10px 12px; border:1px solid var(--line); border-radius:9px; outline:0; background:#fbfcfa; font-size:12px; }
+.category-chip small { margin-left:2px; color:var(--muted); font-weight:500; }
+.category-block { margin-bottom:18px; padding:16px; border:1px solid var(--line); border-radius:12px; background:var(--paper); }
+.category-block-head { margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; }
+.category-block-head strong { font-size:13px; }
+.subcategory-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.subcategory-add-form { display:flex; flex-wrap:wrap; gap:8px; }
+.subcategory-add-form input { flex:1; min-width:140px; padding:9px 11px; border:1px solid var(--line); border-radius:9px; outline:0; background:white; font-size:11px; }
+
+.field-hint { display:block; margin-top:5px; color:var(--muted); font-size:9px; font-weight:500; }
+
+.portal-banner-card { width:100%; padding:14px; border:1px solid var(--line); border-radius:12px; position:relative; display:flex; gap:14px; background:white; }
+.portal-banner-card-image { width:110px; height:90px; flex:0 0 auto; border-radius:9px; object-fit:cover; }
+.portal-banner-card-fields { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.portal-banner-card-fields label:first-child { grid-column:1/-1; }
+.portal-banner-card-fields label { margin:0; display:block; color:#515b58; font-size:9px; font-weight:650; }
+.portal-banner-card-fields input,.portal-banner-card-fields select { width:100%; margin-top:5px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; outline:0; background:#fbfcfa; font-size:10px; }
+.portal-banner-card-remove { position:absolute; right:10px; top:10px; width:24px; height:24px; border:0; border-radius:50%; color:white; background:rgba(20,26,24,.62); font-size:13px; line-height:1; cursor:pointer; }
+
+.public-store-filters { padding:0 6% 24px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px; }
+.public-store-category-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.public-store-category-chips button { padding:8px 14px; border:1px solid #ddd9d3; border-radius:999px; background:white; color:#5c635f; font:600 11px var(--font-geist-sans),Arial,sans-serif; cursor:pointer; }
+.public-store-category-chips button.active { border-color:var(--store-accent); color:white; background:var(--store-accent); }
+.public-store-search { width:min(260px,100%); padding:9px 14px; border:1px solid #ddd9d3; border-radius:999px; outline:0; background:white; font:400 12px var(--font-geist-sans),Arial,sans-serif; }
+.public-store-search:focus { border-color:var(--store-accent); }
+.public-store-hero-content.is-clickable { cursor:pointer; }
 
 .contacts-head,.contacts-row { display:grid; grid-template-columns:1.8fr 1.1fr 1.4fr 1fr; gap:14px; align-items:center; padding:13px 19px; }
 .contacts-head { background:#fafbf8; color:#8e9693; font-size:10px; font-weight:650; text-transform:uppercase; letter-spacing:.5px; }
