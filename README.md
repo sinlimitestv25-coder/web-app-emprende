@@ -1,4 +1,4 @@
-# Nexo v0.6.3
+# Nexo v0.7.1
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -97,6 +97,17 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - botón "Salir" más grande y visible, con ícono, en el panel del emprendimiento y en superadministración;
 - se sacó la flechita sin función junto al nombre del emprendimiento;
 - el logo del emprendimiento pasa a ocupar todo el ancho del sidebar cuando se expande (antes solo se agrandaba como cuadrado).
+
+### Identidad real y ajuste de botón Salir 0.7
+
+- el emprendimiento de demostración pasó a llamarse "Pensando en ti" (antes "Luna Creativa"), con su logo, dos imágenes de banner y textos de bienvenida propios, ya cargados por defecto;
+- logo real de Nexo en el sidebar (superadministración y panel del emprendimiento), en vez de la letra "N";
+- corregido el botón "Salir" del sidebar expandido: se cortaba ("Sali") porque el bloque del nombre le dejaba muy poco espacio.
+
+### Correcciones 0.7.1
+
+- en Pedidos, cada tarjeta de estado mostraba dos íconos superpuestos y desalineados (uno viejo de texto, uno nuevo); se sacó el viejo y el nuevo quedó en el margen derecho de cada tarjeta;
+- se corrigió el enlace público del portal, que daba error 404 porque la exportación estática todavía apuntaba al nombre de tienda anterior ("luna-creativa") después de renombrar el emprendimiento a "Pensando en ti".
 
 ## Configuración
 
