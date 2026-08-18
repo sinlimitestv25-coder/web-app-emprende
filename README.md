@@ -1,4 +1,4 @@
-# Nexo v0.7.1
+# Nexo v0.7.2
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -108,6 +108,11 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 
 - en Pedidos, cada tarjeta de estado mostraba dos íconos superpuestos y desalineados (uno viejo de texto, uno nuevo); se sacó el viejo y el nuevo quedó en el margen derecho de cada tarjeta;
 - se corrigió el enlace público del portal, que daba error 404 porque la exportación estática todavía apuntaba al nombre de tienda anterior ("luna-creativa") después de renombrar el emprendimiento a "Pensando en ti".
+
+### Ajustes de sidebar 0.7.2
+
+- cuando hay un logo cargado, el sidebar expandido ya no muestra el nombre al lado: el logo ocupa todo el espacio (arriba, con el nombre incluido en la imagen, mostrarlo dos veces era redundante);
+- mejor contraste para el texto "Administradora" debajo del logo, sin cambiar el fondo oscuro del sidebar.
 
 ## Configuración
 
