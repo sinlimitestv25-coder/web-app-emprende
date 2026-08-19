@@ -1,4 +1,4 @@
-# Nexo v1.0.1
+# Nexo v1.0.2
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -159,6 +159,11 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - los pedidos ahora tienen un canal: "Portal / WhatsApp" (automático) o "Venta directa" (al cargarlos desde Pedidos, por ejemplo en una feria);
 - al armar una venta directa se puede anotar el lugar (feria, puesto, etc.), visible como etiqueta en la tabla de Pedidos — la base para más adelante poder comparar qué lugar conviene más;
 - corregido un detalle de la entrega anterior: los pedidos de ejemplo no tenían los campos de variante que se habían agregado.
+
+### Cliente opcional en venta directa 1.0.2
+
+- "Armar pedido" ya no exige elegir un cliente: hay una opción "Venta directa (sin cliente)" arriba de la lista, pensada para cuando cargás una venta de feria sin pedirle el nombre a la persona — el pedido queda a nombre de "Vendedora";
+- si el pedido no tiene cliente (o el cliente no tiene teléfono cargado), el botón de WhatsApp de esa fila en Pedidos aparece apagado en vez de abrir un enlace roto.
 
 ## Configuración
 

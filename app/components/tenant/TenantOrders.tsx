@@ -15,7 +15,7 @@ export function TenantOrders({ state, setState, changeStatus, flash }: { state: 
   const [filter, setFilter] = useState<"Todos" | OrderStatus>("Todos");
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const firstProduct = state.products.find((product) => productStock(product) > 0);
-  const [form, setForm] = useState({ customerId: state.customers[0]?.id ?? "", productId: firstProduct?.id ?? "", variantId: firstProduct?.variants.find((variant) => variant.stock > 0)?.id ?? "", quantity: "1", location: "" });
+  const [form, setForm] = useState({ customerId: "", productId: firstProduct?.id ?? "", variantId: firstProduct?.variants.find((variant) => variant.stock > 0)?.id ?? "", quantity: "1", location: "" });
   const visible = state.orders.filter((order) => filter === "Todos" || order.status === filter);
   const selectedProduct = state.products.find((item) => item.id === form.productId);
   const selectedVariant = selectedProduct?.variants.find((variant) => variant.id === form.variantId);
@@ -30,13 +30,13 @@ export function TenantOrders({ state, setState, changeStatus, flash }: { state: 
     const customer = state.customers.find((item) => item.id === form.customerId);
     const product = state.products.find((item) => item.id === form.productId);
     const quantity = Math.max(1, Number(form.quantity));
-    if (!customer || !product) return;
+    if (!product) return;
     const variant = product.variants.find((item) => item.id === form.variantId);
     if (product.variants.length > 0 && !variant) { flash("Elegí una variante."); return; }
     const availableStock = variant ? variant.stock : productStock(product);
     if (quantity > availableStock) { flash("La cantidad solicitada supera el stock disponible."); return; }
     const unitPrice = variant ? variant.price : product.price;
-    const order: Order = { id: `PED-${1049 + state.orders.length}`, customerId: customer.id, customerName: customer.name, items: [{ productId: product.id, productName: product.name, variantId: variant?.id ?? "", variantName: variant?.name ?? "", quantity, unitPrice }], total: unitPrice * quantity, status: "Nuevo", createdAt: "Ahora", stockCommitted: false, channel: "directa", location: form.location.trim() };
+    const order: Order = { id: `PED-${1049 + state.orders.length}`, customerId: customer?.id ?? "", customerName: customer?.name ?? "Vendedora", items: [{ productId: product.id, productName: product.name, variantId: variant?.id ?? "", variantName: variant?.name ?? "", quantity, unitPrice }], total: unitPrice * quantity, status: "Nuevo", createdAt: "Ahora", stockCommitted: false, channel: "directa", location: form.location.trim() };
     setState((current) => ({ ...current, orders: [order, ...current.orders] }));
     setOpen(false);
     flash("Pedido creado. El stock se descontará al comenzar a prepararlo.");
@@ -62,12 +62,17 @@ export function TenantOrders({ state, setState, changeStatus, flash }: { state: 
           </div>
           <b>{money.format(order.total)}</b>
           <select className={`order-status-select status-${order.status.toLowerCase()}`} value={order.status} onChange={(event) => changeStatus(order.id, event.target.value as OrderStatus)}>{statuses.map((status) => <option key={status}>{status}</option>)}</select>
-          <a className="icon-action-button whatsapp" href={`https://wa.me/${(state.customers.find((customer) => customer.id === order.customerId)?.phone ?? "").replace(/\D/g, "")}`} target="_blank" rel="noreferrer" aria-label={`Abrir WhatsApp con ${order.customerName}`}><AppIcon name="whatsapp" /></a>
+          {(() => {
+            const phone = state.customers.find((customer) => customer.id === order.customerId)?.phone;
+            return phone
+              ? <a className="icon-action-button whatsapp" href={`https://wa.me/${phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" aria-label={`Abrir WhatsApp con ${order.customerName}`}><AppIcon name="whatsapp" /></a>
+              : <span className="icon-action-button whatsapp disabled" aria-hidden="true"><AppIcon name="whatsapp" /></span>;
+          })()}
         </div>
       ))}
       {visible.length === 0 && <div className="empty-state">No hay pedidos en este estado.</div>}
     </section>
-    {open && <div className="modal-backdrop" onMouseDown={() => setOpen(false)}><form className="modal" onSubmit={save} onMouseDown={(event) => event.stopPropagation()}><button type="button" className="modal-close" onClick={() => setOpen(false)}>×</button><p className="eyebrow">Nueva venta</p><h2>Armar pedido</h2><p>Seleccioná cliente, producto y cantidad. El pedido quedará pendiente de preparación.</p><label>Cliente<select required value={form.customerId} onChange={(event) => setForm({ ...form, customerId: event.target.value })}>{state.customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name} · {customer.phone}</option>)}</select></label><label>Producto<select required value={form.productId} onChange={(event) => selectProduct(event.target.value)}>{state.products.filter((product) => productStock(product) > 0).map((product) => <option key={product.id} value={product.id}>{product.name} · {productStock(product)} disponibles</option>)}</select></label>{(selectedProduct?.variants.length ?? 0) > 0 && <label>Variante<select required value={form.variantId} onChange={(event) => setForm({ ...form, variantId: event.target.value })}><option value="">Elegir…</option>{selectedProduct!.variants.map((variant) => <option key={variant.id} value={variant.id} disabled={variant.stock <= 0}>{variant.name} · {variant.stock} disponibles · {money.format(variant.price)}</option>)}</select></label>}<label>Cantidad<input required type="number" min="1" value={form.quantity} onChange={(event) => setForm({ ...form, quantity: event.target.value })} /></label><label>Lugar de la venta (opcional)<input value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} placeholder="Ej. Feria de Avellaneda" /></label><small className="field-hint">Este pedido queda marcado como venta directa (vos como vendedora), no como pedido de un cliente por WhatsApp o el portal.</small><div className="order-rule"><span>i</span><p><strong>Reserva de unidades</strong>El stock no cambia al crear el pedido. Se descuenta cuando comienza la preparación.</p></div><button className="button primary full">Crear pedido</button></form></div>}
+    {open && <div className="modal-backdrop" onMouseDown={() => setOpen(false)}><form className="modal" onSubmit={save} onMouseDown={(event) => event.stopPropagation()}><button type="button" className="modal-close" onClick={() => setOpen(false)}>×</button><p className="eyebrow">Nueva venta</p><h2>Armar pedido</h2><p>Seleccioná cliente, producto y cantidad. El pedido quedará pendiente de preparación.</p><label>Cliente<select value={form.customerId} onChange={(event) => setForm({ ...form, customerId: event.target.value })}><option value="">Venta directa (sin cliente)</option>{state.customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name} · {customer.phone}</option>)}</select></label><label>Producto<select required value={form.productId} onChange={(event) => selectProduct(event.target.value)}>{state.products.filter((product) => productStock(product) > 0).map((product) => <option key={product.id} value={product.id}>{product.name} · {productStock(product)} disponibles</option>)}</select></label>{(selectedProduct?.variants.length ?? 0) > 0 && <label>Variante<select required value={form.variantId} onChange={(event) => setForm({ ...form, variantId: event.target.value })}><option value="">Elegir…</option>{selectedProduct!.variants.map((variant) => <option key={variant.id} value={variant.id} disabled={variant.stock <= 0}>{variant.name} · {variant.stock} disponibles · {money.format(variant.price)}</option>)}</select></label>}<label>Cantidad<input required type="number" min="1" value={form.quantity} onChange={(event) => setForm({ ...form, quantity: event.target.value })} /></label><label>Lugar de la venta (opcional)<input value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} placeholder="Ej. Feria de Avellaneda" /></label><small className="field-hint">Este pedido queda marcado como venta directa (vos como vendedora), no como pedido de un cliente por WhatsApp o el portal.</small><div className="order-rule"><span>i</span><p><strong>Reserva de unidades</strong>El stock no cambia al crear el pedido. Se descuenta cuando comienza la preparación.</p></div><button className="button primary full">Crear pedido</button></form></div>}
     {detailOrder && <OrderDetailModal order={detailOrder} onClose={() => setDetailOrder(null)} />}
   </>;
 }

@@ -451,6 +451,7 @@ button { color: inherit; }
 .icon-action-button.edit:hover { background:#cbe0ec; }
 .icon-action-button.delete { color:#a34737; background:#f7ded9; }
 .icon-action-button.delete:hover { background:#f1cdc5; }
+.icon-action-button.disabled { opacity:.35; cursor:default; }
 @media (max-width:1024px) { .contacts-head,.contacts-row { grid-template-columns:1.4fr 1fr 1.1fr 1fr; } }
 
 /* Nexo v1.0 · Variantes, stock por variante y avisos de reposición */
