@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { defaultTenantDemo, migrateBanners, migrateCategories, migrateOrders, tenantNavItems, tenantStorageKey, type OrderStatus, type TenantDemoState, type TenantNavId } from "../../data/tenant-demo";
+import { defaultTenantDemo, migrateBanners, migrateCategories, migrateOrders, migrateProducts, productLowStock, tenantNavItems, tenantStorageKey, type OrderStatus, type TenantDemoState, type TenantNavId } from "../../data/tenant-demo";
 import { TenantDashboard } from "./TenantDashboard";
 import { TenantInventory } from "./TenantInventory";
 import { TenantContacts } from "./TenantContacts";
@@ -25,6 +25,8 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
         portal: { ...defaultTenantDemo.portal, ...parsed.portal, banners: migrateBanners(parsed.portal) },
         categories: parsed.categories?.length ? migrateCategories(parsed.categories) : defaultTenantDemo.categories,
         orders: migrateOrders(parsed.orders),
+        products: migrateProducts(parsed.products),
+        stockRequests: Array.isArray(parsed.stockRequests) ? parsed.stockRequests : [],
       };
     } catch {
       window.localStorage.removeItem(tenantStorageKey);
@@ -41,7 +43,7 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
     }
   }, [state]);
 
-  const lowStock = useMemo(() => state.products.filter((product) => product.stock <= product.minStock).length, [state.products]);
+  const lowStock = useMemo(() => state.products.filter(productLowStock).length, [state.products]);
 
   function navigate(id: TenantNavId) {
     setActive(id);
@@ -60,29 +62,40 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
       if (!order) return current;
       let products = current.products;
       let committed = order.stockCommitted;
+
+      function stockFor(product: (typeof products)[number], variantId: string): number {
+        if (!variantId) return product.stock;
+        return product.variants.find((variant) => variant.id === variantId)?.stock ?? 0;
+      }
+
+      function adjustStock(direction: 1 | -1) {
+        products = products.map((product) => {
+          const line = order!.items.find((item) => item.productId === product.id);
+          if (!line) return product;
+          if (line.variantId) {
+            const variants = product.variants.map((variant) => variant.id === line.variantId ? { ...variant, stock: variant.stock + direction * line.quantity } : variant);
+            return { ...product, variants };
+          }
+          const stock = product.stock + direction * line.quantity;
+          return { ...product, stock, published: direction < 0 ? stock > 0 && product.published : product.published };
+        });
+      }
+
       if (!committed && ["Preparando", "Listo", "Entregado"].includes(nextStatus)) {
         const insufficient = order.items.find((line) => {
           const product = products.find((item) => item.id === line.productId);
-          return !product || product.stock < line.quantity;
+          return !product || stockFor(product, line.variantId) < line.quantity;
         });
         if (insufficient) {
           result = "No hay stock suficiente para preparar este pedido.";
           return current;
         }
-        products = products.map((product) => {
-          const line = order.items.find((item) => item.productId === product.id);
-          if (!line) return product;
-          const stock = product.stock - line.quantity;
-          return { ...product, stock, published: stock > 0 && product.published };
-        });
+        adjustStock(-1);
         committed = true;
         result = "Pedido en preparación: el stock quedó descontado.";
       }
       if (committed && nextStatus === "Cancelado") {
-        products = products.map((product) => {
-          const line = order.items.find((item) => item.productId === product.id);
-          return line ? { ...product, stock: product.stock + line.quantity } : product;
-        });
+        adjustStock(1);
         committed = false;
         result = "Pedido cancelado: el stock fue reintegrado.";
       }
@@ -118,7 +131,7 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
         <section className="content">
           {notice && <div className="toast" role="status"><AppIcon name="check" /> {notice}</div>}
           {active === "inicio" && <TenantDashboard state={state} onNavigate={navigate} />}
-          {active === "inventario" && <TenantInventory products={state.products} setProducts={(products) => setState((current) => ({ ...current, products }))} categories={state.categories} flash={flash} />}
+          {active === "inventario" && <TenantInventory products={state.products} setProducts={(products) => setState((current) => ({ ...current, products }))} categories={state.categories} stockRequests={state.stockRequests} flash={flash} />}
           {active === "clientes" && <TenantContacts mode="customers" state={state} setState={setState} flash={flash} />}
           {active === "proveedores" && <TenantContacts mode="suppliers" state={state} setState={setState} flash={flash} />}
           {active === "pedidos" && <TenantOrders state={state} setState={setState} changeStatus={changeOrderStatus} flash={flash} />}

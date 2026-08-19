@@ -1,4 +1,4 @@
-# Nexo v0.9
+# Nexo v1.0
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -144,6 +144,15 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - portal público: fila de categorías + buscador de texto libre que busca por nombre, descripción, categoría y subcategoría;
 - banners del carrusel con título propio por imagen y, opcionalmente, un enlace a una categoría, subcategoría o palabra clave — al hacer clic, el catálogo se filtra solo;
 - se sacó el editor de banners duplicado de Ajustes (quedó un solo lugar: Portal de ventas).
+
+### Variantes de producto y demanda de reposición 1.0
+
+- productos con variantes (personaje, talle, color…), cada una con su propia foto, stock, costo y precio — sin variantes, el producto sigue funcionando como antes;
+- el descuento y la devolución de stock en Pedidos ahora afectan a la variante puntual pedida, no al producto entero;
+- "Armar pedido" permite elegir la variante al cargar una venta manual (por ejemplo, desde una feria);
+- interruptor por producto para mostrarlo en el portal aunque se quede sin stock, en vez de ocultarlo automáticamente;
+- botón "Avisame cuando haya stock" para productos sin stock visibles, que registra el pedido en un panel nuevo de Inventario ("Interés en productos sin stock") con acceso directo a WhatsApp de cada interesado;
+- botón "Consultar por WhatsApp" en cada producto del portal público.
 
 ## Configuración
 

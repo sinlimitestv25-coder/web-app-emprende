@@ -3,8 +3,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control -- the hidden file input inside each label remains reachable and labelled by its wrapping label */
 
 import { useState, type ChangeEvent, type Dispatch, type FormEvent, type SetStateAction } from "react";
-import type { Banner, BannerLinkType, PortalSettings, Product, TenantDemoState } from "../../data/tenant-demo";
-import { ProductModal, emptyProductForm, type ProductFormState } from "./ProductModal";
+import { productMinPrice, productStock, type Banner, type BannerLinkType, type PortalSettings, type Product, type TenantDemoState } from "../../data/tenant-demo";
+import { ProductModal, emptyProductForm, fromVariantForm, toVariantForm, type ProductFormState } from "./ProductModal";
 import { prepareImage } from "../../lib/image";
 import { AppIcon } from "../ui/AppIcon";
 
@@ -68,13 +68,18 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
 
   function openProduct(product?: Product) {
     setEditingProductId(product?.id ?? null);
-    setProductForm(product ? { name: product.name, sku: product.sku, category: product.category, subcategory: product.subcategory ?? "", variant: product.variant, description: product.description ?? "", image: product.image ?? "", stock: String(product.stock), minStock: String(product.minStock), price: String(product.price), cost: String(product.cost) } : { ...emptyProductForm, category: state.categories[0]?.name ?? "" });
+    setProductForm(product
+      ? { name: product.name, sku: product.sku, category: product.category, subcategory: product.subcategory ?? "", variant: product.variant, description: product.description ?? "", image: product.image ?? "", stock: String(product.stock), minStock: String(product.minStock), price: String(product.price), cost: String(product.cost), hideWhenOutOfStock: product.hideWhenOutOfStock ?? true, variants: (product.variants ?? []).map(toVariantForm) }
+      : { ...emptyProductForm, category: state.categories[0]?.name ?? "" });
     setProductModalOpen(true);
   }
 
   function saveProduct(event: FormEvent) {
     event.preventDefault();
-    const item: Product = { id: editingProductId ?? `prd_${Date.now()}`, name: productForm.name.trim(), sku: productForm.sku.trim().toUpperCase(), category: productForm.category, subcategory: productForm.subcategory, variant: productForm.variant.trim(), description: productForm.description.trim(), image: productForm.image, stock: Math.max(0, Number(productForm.stock)), minStock: Math.max(0, Number(productForm.minStock)), price: Math.max(0, Number(productForm.price)), cost: Math.max(0, Number(productForm.cost)), published: editingProductId ? state.products.find((product) => product.id === editingProductId)?.published ?? false : Number(productForm.stock) > 0 };
+    const variants = productForm.variants.map(fromVariantForm);
+    const stock = variants.length > 0 ? variants.reduce((total, variant) => total + variant.stock, 0) : Math.max(0, Number(productForm.stock));
+    const price = variants.length > 0 ? Math.min(...variants.map((variant) => variant.price)) : Math.max(0, Number(productForm.price));
+    const item: Product = { id: editingProductId ?? `prd_${Date.now()}`, name: productForm.name.trim(), sku: productForm.sku.trim().toUpperCase(), category: productForm.category, subcategory: productForm.subcategory, variant: productForm.variant.trim(), description: productForm.description.trim(), image: productForm.image, stock, minStock: Math.max(0, Number(productForm.minStock)), price, cost: Math.max(0, Number(productForm.cost)), hideWhenOutOfStock: productForm.hideWhenOutOfStock, variants, published: editingProductId ? state.products.find((product) => product.id === editingProductId)?.published ?? false : stock > 0 };
     setState((current) => ({ ...current, products: editingProductId ? current.products.map((product) => product.id === editingProductId ? item : product) : [item, ...current.products] }));
     setProductModalOpen(false);
     flash(editingProductId ? "Producto actualizado." : "Producto agregado al catálogo.");
@@ -83,7 +88,7 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
   function toggleProductPublished(id: string) {
     const product = state.products.find((item) => item.id === id);
     if (!product) return;
-    if (!product.stock && !product.published) { flash("No se puede publicar un producto sin stock."); return; }
+    if (!productStock(product) && !product.published) { flash("No se puede publicar un producto sin stock."); return; }
     setState((current) => ({ ...current, products: current.products.map((item) => item.id === id ? { ...item, published: !item.published } : item) }));
     flash(product.published ? "Producto ocultado del portal." : "Producto publicado en el portal.");
   }
@@ -152,11 +157,11 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
           <article className="portal-catalog-card" key={product.id}>
             {product.image ? <img src={product.image} alt="" /> : <div className="portal-catalog-placeholder">{product.category.slice(0, 1)}</div>}
             <div className="portal-catalog-info">
-              <strong>{product.name}</strong>
-              <span>{money.format(product.price)}</span>
+              <strong>{product.name}{product.variants.length > 0 && <small> · {product.variants.length} variantes</small>}</strong>
+              <span>{product.variants.length > 0 ? `Desde ${money.format(productMinPrice(product))}` : money.format(product.price)}</span>
             </div>
             <div className="portal-catalog-actions">
-              <button className={product.published && product.stock > 0 ? "switch active" : "switch"} onClick={() => toggleProductPublished(product.id)} aria-label={`${product.published ? "Ocultar" : "Publicar"} ${product.name}`}><i /></button>
+              <button className={product.published && productStock(product) > 0 ? "switch active" : "switch"} onClick={() => toggleProductPublished(product.id)} aria-label={`${product.published ? "Ocultar" : "Publicar"} ${product.name}`}><i /></button>
               <button className="row-action" onClick={() => openProduct(product)}>Editar</button>
             </div>
           </article>

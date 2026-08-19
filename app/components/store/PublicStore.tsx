@@ -3,10 +3,55 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions -- modal backdrop is only a pointer shortcut, closable by its own button */
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { defaultTenantDemo, migrateBanners, migrateCategories, migrateOrders, tenantStorageKey, type Banner, type Order, type TenantDemoState } from "../../data/tenant-demo";
+import {
+  defaultTenantDemo,
+  migrateBanners,
+  migrateCategories,
+  migrateOrders,
+  migrateProducts,
+  productStock,
+  tenantStorageKey,
+  type Banner,
+  type Order,
+  type Product,
+  type ProductVariant,
+  type StockRequest,
+  type TenantDemoState,
+} from "../../data/tenant-demo";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 const slideIntervalMs = 5000;
+
+type CartLine = {
+  key: string;
+  productId: string;
+  productName: string;
+  variantId: string;
+  variantName: string;
+  price: number;
+  image: string;
+  quantity: number;
+};
+
+function cartKey(productId: string, variantId: string) {
+  return `${productId}::${variantId}`;
+}
+
+function readLatestState(fallback: TenantDemoState): TenantDemoState {
+  const saved = window.localStorage.getItem(tenantStorageKey);
+  if (!saved) return fallback;
+  try {
+    const parsed = JSON.parse(saved) as TenantDemoState;
+    return {
+      ...parsed,
+      products: migrateProducts(parsed.products),
+      orders: migrateOrders(parsed.orders),
+      stockRequests: Array.isArray(parsed.stockRequests) ? parsed.stockRequests : [],
+    };
+  } catch {
+    return fallback;
+  }
+}
 
 export function PublicStore({ slug }: { slug: string }) {
   const [state, setState] = useState<TenantDemoState>(defaultTenantDemo);
@@ -18,6 +63,10 @@ export function PublicStore({ slug }: { slug: string }) {
   const [notice, setNotice] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [selectedVariant, setSelectedVariant] = useState<Record<string, string>>({});
+  const [notifyFor, setNotifyFor] = useState<{ product: Product; variant: ProductVariant | null } | null>(null);
+  const [requestName, setRequestName] = useState("");
+  const [requestPhone, setRequestPhone] = useState("");
 
   useEffect(() => {
     const saved = window.localStorage.getItem(tenantStorageKey);
@@ -29,6 +78,8 @@ export function PublicStore({ slug }: { slug: string }) {
         portal: { ...defaultTenantDemo.portal, ...parsed.portal, banners: migrateBanners(parsed.portal) },
         categories: parsed.categories?.length ? migrateCategories(parsed.categories) : defaultTenantDemo.categories,
         orders: migrateOrders(parsed.orders),
+        products: migrateProducts(parsed.products),
+        stockRequests: Array.isArray(parsed.stockRequests) ? parsed.stockRequests : [],
       });
     } catch {
       /* datos de prueba corruptos: se ignoran */
@@ -37,14 +88,46 @@ export function PublicStore({ slug }: { slug: string }) {
 
   const { portal, products } = state;
   const banners = portal.banners;
-  const published = useMemo(() => products.filter((product) => product.published && product.stock > 0), [products]);
+  const published = useMemo(() => products.filter((product) => {
+    if (!product.published) return false;
+    const stock = productStock(product);
+    return stock > 0 || !product.hideWhenOutOfStock;
+  }), [products]);
   const filtered = useMemo(() => published.filter((product) => {
     if (categoryFilter && product.category !== categoryFilter) return false;
     if (!searchText.trim()) return true;
     const haystack = `${product.name} ${product.description} ${product.category} ${product.subcategory ?? ""}`.toLowerCase();
     return haystack.includes(searchText.trim().toLowerCase());
   }), [published, categoryFilter, searchText]);
-  const cartLines = useMemo(() => published.filter((product) => cart[product.id]).map((product) => ({ ...product, quantity: cart[product.id] })), [cart, published]);
+
+  function variantFor(product: Product): ProductVariant | null {
+    if (product.variants.length === 0) return null;
+    const selectedId = selectedVariant[product.id];
+    if (selectedId) return product.variants.find((item) => item.id === selectedId) ?? product.variants[0];
+    return product.variants.find((item) => item.stock > 0) ?? product.variants[0];
+  }
+
+  const cartLines = useMemo(() => {
+    const lines: CartLine[] = [];
+    for (const [key, quantity] of Object.entries(cart)) {
+      if (!quantity) continue;
+      const [productId, variantId] = key.split("::");
+      const product = published.find((item) => item.id === productId);
+      if (!product) continue;
+      const variant = variantId ? product.variants.find((item) => item.id === variantId) : undefined;
+      lines.push({
+        key,
+        productId,
+        productName: product.name,
+        variantId: variantId || "",
+        variantName: variant?.name ?? "",
+        price: variant ? variant.price : product.price,
+        image: variant?.image || product.image,
+        quantity,
+      });
+    }
+    return lines;
+  }, [cart, published]);
   const cartTotal = cartLines.reduce((total, line) => total + line.price * line.quantity, 0);
   const cartCount = Object.values(cart).reduce((total, quantity) => total + quantity, 0);
 
@@ -62,14 +145,14 @@ export function PublicStore({ slug }: { slug: string }) {
     document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
   }
 
-  function add(productId: string) {
-    const product = published.find((item) => item.id === productId);
-    if (!product) return;
-    setCart((current) => ({ ...current, [productId]: Math.min(product.stock, (current[productId] ?? 0) + 1) }));
+  function add(product: Product, variant: ProductVariant | null) {
+    const key = cartKey(product.id, variant?.id ?? "");
+    const stock = variant ? variant.stock : productStock(product);
+    setCart((current) => ({ ...current, [key]: Math.min(stock, (current[key] ?? 0) + 1) }));
   }
 
-  function remove(productId: string) {
-    setCart((current) => ({ ...current, [productId]: Math.max(0, (current[productId] ?? 0) - 1) }));
+  function remove(key: string) {
+    setCart((current) => ({ ...current, [key]: Math.max(0, (current[key] ?? 0) - 1) }));
   }
 
   function flash(text: string) {
@@ -77,7 +160,12 @@ export function PublicStore({ slug }: { slug: string }) {
     window.setTimeout(() => setNotice(""), 2800);
   }
 
-  const message = encodeURIComponent(`Hola ${portal.storeName}, quiero hacer este pedido:\n${cartLines.map((line) => `• ${line.name} × ${line.quantity} — ${money.format(line.price * line.quantity)}`).join("\n")}\nTotal: ${money.format(cartTotal)}`);
+  function consultUrl(product: Product) {
+    const text = encodeURIComponent(`Hola ${portal.storeName}, quería consultar sobre "${product.name}".`);
+    return `https://wa.me/${portal.whatsapp}?text=${text}`;
+  }
+
+  const message = encodeURIComponent(`Hola ${portal.storeName}, quiero hacer este pedido:\n${cartLines.map((line) => `• ${line.productName}${line.variantName ? ` (${line.variantName})` : ""} × ${line.quantity} — ${money.format(line.price * line.quantity)}`).join("\n")}\nTotal: ${money.format(cartTotal)}`);
   const whatsappUrl = `https://wa.me/${portal.whatsapp}?text=${message}`;
 
   function checkout() {
@@ -86,17 +174,7 @@ export function PublicStore({ slug }: { slug: string }) {
       return;
     }
 
-    const saved = window.localStorage.getItem(tenantStorageKey);
-    let latest = state;
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as TenantDemoState;
-        latest = { ...parsed, orders: migrateOrders(parsed.orders) };
-      } catch {
-        latest = state;
-      }
-    }
-
+    const latest = readLatestState(state);
     const phoneDigits = buyerPhone.replace(/\D/g, "");
     const existing = latest.customers.find((customer) => customer.phone.replace(/\D/g, "") === phoneDigits);
     const customer = existing ?? { id: `cli_${Date.now()}`, name: buyerName.trim(), phone: buyerPhone.trim(), email: "", notes: "Pedido realizado desde el portal." };
@@ -106,7 +184,7 @@ export function PublicStore({ slug }: { slug: string }) {
       id: `PED-${1049 + latest.orders.length}`,
       customerId: customer.id,
       customerName: customer.name,
-      items: cartLines.map((line) => ({ productId: line.id, productName: line.name, quantity: line.quantity, unitPrice: line.price })),
+      items: cartLines.map((line) => ({ productId: line.productId, productName: line.productName, variantId: line.variantId, variantName: line.variantName, quantity: line.quantity, unitPrice: line.price })),
       total: cartTotal,
       status: "Nuevo",
       createdAt: "Portal · ahora",
@@ -125,6 +203,36 @@ export function PublicStore({ slug }: { slug: string }) {
     setBuyerName("");
     setBuyerPhone("");
     setCartOpen(false);
+  }
+
+  function submitStockRequest() {
+    if (!notifyFor) return;
+    if (!requestName.trim() || !requestPhone.trim()) {
+      flash("Ingresá tu nombre y tu WhatsApp para avisarte.");
+      return;
+    }
+    const latest = readLatestState(state);
+    const request: StockRequest = {
+      id: `req_${Date.now()}`,
+      productId: notifyFor.product.id,
+      productName: notifyFor.product.name,
+      variantId: notifyFor.variant?.id ?? "",
+      variantName: notifyFor.variant?.name ?? "",
+      customerName: requestName.trim(),
+      customerPhone: requestPhone.trim(),
+      createdAt: "Portal · ahora",
+    };
+    const updated: TenantDemoState = { ...latest, stockRequests: [request, ...latest.stockRequests] };
+    try {
+      window.localStorage.setItem(tenantStorageKey, JSON.stringify(updated));
+    } catch {
+      /* si no se pudo guardar, igual confirmamos: no es un dato crítico para el comprador */
+    }
+    setState(updated);
+    setNotifyFor(null);
+    setRequestName("");
+    setRequestPhone("");
+    flash("¡Listo! Te avisamos apenas tengamos stock.");
   }
 
   if (portal.slug !== slug) {
@@ -207,20 +315,39 @@ export function PublicStore({ slug }: { slug: string }) {
           <input className="public-store-search" value={searchText} onChange={(event) => setSearchText(event.target.value)} placeholder="Buscar por material, tema, nombre…" />
         </div>
         <div className="public-store-grid">
-          {filtered.map((product, index) => (
-            <article key={product.id} className={`public-store-card tone-${index % 4}`}>
-              <div className="public-store-thumb">
-                {product.image ? <img src={product.image} alt={product.name} /> : <span>{product.category.slice(0, 1)}</span>}
-                {product.stock <= product.minStock && <small>Últimas {product.stock}</small>}
-              </div>
-              <strong>{product.name}</strong>
-              <p>{product.description || product.variant}</p>
-              <footer>
-                <b>{money.format(product.price)}</b>
-                <button type="button" onClick={() => add(product.id)}>Agregar +</button>
-              </footer>
-            </article>
-          ))}
+          {filtered.map((product, index) => {
+            const variant = variantFor(product);
+            const stock = variant ? variant.stock : productStock(product);
+            const minStock = variant ? variant.minStock : product.minStock;
+            const price = variant ? variant.price : product.price;
+            const image = variant?.image || product.image;
+            const outOfStock = stock <= 0;
+            return (
+              <article key={product.id} className={`public-store-card tone-${index % 4}`}>
+                <div className="public-store-thumb">
+                  {image ? <img src={image} alt={product.name} /> : <span>{product.category.slice(0, 1)}</span>}
+                  {!outOfStock && stock <= minStock && <small>Últimas {stock}</small>}
+                  {outOfStock && <small className="public-store-out-badge">Sin stock</small>}
+                </div>
+                <strong>{product.name}</strong>
+                <p>{product.description || product.variant}</p>
+                {product.variants.length > 0 && (
+                  <div className="public-store-variant-picker">
+                    {product.variants.map((item) => (
+                      <button key={item.id} type="button" className={variant?.id === item.id ? (item.stock <= 0 ? "active is-out" : "active") : (item.stock <= 0 ? "is-out" : "")} onClick={() => setSelectedVariant((current) => ({ ...current, [product.id]: item.id }))}>{item.name}</button>
+                    ))}
+                  </div>
+                )}
+                <footer>
+                  <b>{money.format(price)}</b>
+                  {outOfStock
+                    ? <button type="button" className="public-store-notify" onClick={() => setNotifyFor({ product, variant })}>Avisame</button>
+                    : <button type="button" onClick={() => add(product, variant)}>Agregar +</button>}
+                </footer>
+                <a className="public-store-consult" href={consultUrl(product)} target="_blank" rel="noreferrer">Consultar por WhatsApp</a>
+              </article>
+            );
+          })}
           {published.length === 0 && <p className="public-store-empty">Todavía no hay productos publicados.</p>}
           {published.length > 0 && filtered.length === 0 && <p className="public-store-empty">No encontramos productos con ese filtro.</p>}
         </div>
@@ -238,10 +365,10 @@ export function PublicStore({ slug }: { slug: string }) {
             <h2>Tu carrito</h2>
             <div className="public-store-cart-lines">
               {cartLines.map((line) => (
-                <div key={line.id}>
-                  <span><strong>{line.name}</strong><small>{line.quantity} × {money.format(line.price)}</small></span>
+                <div key={line.key}>
+                  <span><strong>{line.productName}{line.variantName && ` — ${line.variantName}`}</strong><small>{line.quantity} × {money.format(line.price)}</small></span>
                   <b>{money.format(line.quantity * line.price)}</b>
-                  <button type="button" onClick={() => remove(line.id)} aria-label={`Quitar una unidad de ${line.name}`}>×</button>
+                  <button type="button" onClick={() => remove(line.key)} aria-label={`Quitar una unidad de ${line.productName}`}>×</button>
                 </div>
               ))}
               {cartLines.length === 0 && <div className="public-store-cart-empty">Todavía no agregaste productos.</div>}
@@ -256,6 +383,24 @@ export function PublicStore({ slug }: { slug: string }) {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {notifyFor && (
+        <div className="public-store-modal-backdrop" onMouseDown={() => setNotifyFor(null)}>
+          <div className="public-store-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="public-store-modal-close" type="button" onClick={() => setNotifyFor(null)} aria-label="Cerrar">×</button>
+            <span className="public-store-eyebrow">Avisame cuando haya stock</span>
+            <h2>{notifyFor.product.name}{notifyFor.variant && ` — ${notifyFor.variant.name}`}</h2>
+            <p>Dejanos tus datos y te contactamos apenas repongamos.</p>
+            <div className="public-store-buyer-form">
+              <label>Tu nombre<input value={requestName} onChange={(event) => setRequestName(event.target.value)} placeholder="Nombre y apellido" /></label>
+              <label>Tu WhatsApp<input value={requestPhone} onChange={(event) => setRequestPhone(event.target.value)} placeholder="+54 9…" /></label>
+              <button type="button" className="public-store-checkout" onClick={submitStockRequest}>
+                Avisarme cuando haya stock
+              </button>
+            </div>
           </div>
         </div>
       )}

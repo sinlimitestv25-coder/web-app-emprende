@@ -1,5 +1,15 @@
 export type TenantNavId = "inicio" | "inventario" | "clientes" | "proveedores" | "pedidos" | "portal" | "ajustes";
 
+export type ProductVariant = {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+  cost: number;
+  stock: number;
+  minStock: number;
+};
+
 export type Product = {
   id: string;
   name: string;
@@ -14,7 +24,61 @@ export type Product = {
   price: number;
   cost: number;
   published: boolean;
+  hideWhenOutOfStock: boolean;
+  variants: ProductVariant[];
 };
+
+// Un producto puede vender directo (sin variantes: usa sus propios stock/precio/foto)
+// o tener variantes (Goku, Krillin, "20x8cm"...), cada una con su propio stock, precio y foto.
+// Estas funciones devuelven el valor correcto sin importar cuál de los dos casos sea.
+export function productStock(product: Product): number {
+  return product.variants.length > 0 ? product.variants.reduce((total, variant) => total + variant.stock, 0) : product.stock;
+}
+
+export function productLowStock(product: Product): boolean {
+  return product.variants.length > 0 ? product.variants.some((variant) => variant.stock <= variant.minStock) : product.stock <= product.minStock;
+}
+
+export function productMinPrice(product: Product): number {
+  return product.variants.length > 0 ? Math.min(...product.variants.map((variant) => variant.price)) : product.price;
+}
+
+export function productCostValue(product: Product): number {
+  return product.variants.length > 0
+    ? product.variants.reduce((total, variant) => total + variant.stock * variant.cost, 0)
+    : product.stock * product.cost;
+}
+
+export function productImage(product: Product, variantId?: string): string {
+  if (variantId) {
+    const match = product.variants.find((variant) => variant.id === variantId);
+    if (match?.image) return match.image;
+  }
+  return product.variants.find((variant) => variant.image)?.image || product.image;
+}
+
+// Versiones anteriores a v1.0 no tenían variantes ni el interruptor de "ocultar sin stock".
+// Esto completa esos campos en los productos guardados en el navegador.
+export function migrateProducts(products: unknown): Product[] {
+  if (!Array.isArray(products)) return [];
+  return (products as Partial<Product>[]).map((product) => ({
+    id: product.id ?? `prd_${Date.now()}`,
+    name: product.name ?? "",
+    sku: product.sku ?? "",
+    category: product.category ?? "",
+    subcategory: product.subcategory ?? "",
+    variant: product.variant ?? "",
+    description: product.description ?? "",
+    image: product.image ?? "",
+    stock: product.stock ?? 0,
+    minStock: product.minStock ?? 0,
+    price: product.price ?? 0,
+    cost: product.cost ?? 0,
+    published: product.published ?? false,
+    hideWhenOutOfStock: product.hideWhenOutOfStock ?? true,
+    variants: Array.isArray(product.variants) ? product.variants : [],
+  }));
+}
 
 export type Subcategory = {
   name: string;
@@ -56,8 +120,21 @@ export type OrderStatus = "Nuevo" | "Preparando" | "Listo" | "Entregado" | "Canc
 export type OrderItem = {
   productId: string;
   productName: string;
+  variantId: string;
+  variantName: string;
   quantity: number;
   unitPrice: number;
+};
+
+export type StockRequest = {
+  id: string;
+  productId: string;
+  productName: string;
+  variantId: string;
+  variantName: string;
+  customerName: string;
+  customerPhone: string;
+  createdAt: string;
 };
 
 export type Order = {
@@ -90,6 +167,7 @@ export type TenantDemoState = {
   orders: Order[];
   portal: PortalSettings;
   categories: Category[];
+  stockRequests: StockRequest[];
 };
 
 export const tenantStorageKey = "nexo-v0.3-luna-creativa";
@@ -106,18 +184,28 @@ type LegacyOrder = Partial<Order> & {
 
 export function migrateOrders(orders: unknown): Order[] {
   if (!Array.isArray(orders)) return [];
-  return (orders as LegacyOrder[]).map((order) => ({
-    id: order.id ?? `PED-${Date.now()}`,
-    customerId: order.customerId ?? "",
-    customerName: order.customerName ?? "",
-    items: Array.isArray(order.items) && order.items.length > 0
+  return (orders as LegacyOrder[]).map((order) => {
+    const items = Array.isArray(order.items) && order.items.length > 0
       ? order.items
-      : [{ productId: order.productId ?? "", productName: order.productName ?? "Producto", quantity: order.quantity ?? 1, unitPrice: order.unitPrice ?? 0 }],
-    total: order.total ?? 0,
-    status: order.status ?? "Nuevo",
-    createdAt: order.createdAt ?? "",
-    stockCommitted: order.stockCommitted ?? false,
-  }));
+      : [{ productId: order.productId ?? "", productName: order.productName ?? "Producto", quantity: order.quantity ?? 1, unitPrice: order.unitPrice ?? 0 }];
+    return {
+      id: order.id ?? `PED-${Date.now()}`,
+      customerId: order.customerId ?? "",
+      customerName: order.customerName ?? "",
+      items: (items as Partial<OrderItem>[]).map((item) => ({
+        productId: item.productId ?? "",
+        productName: item.productName ?? "Producto",
+        variantId: item.variantId ?? "",
+        variantName: item.variantName ?? "",
+        quantity: item.quantity ?? 1,
+        unitPrice: item.unitPrice ?? 0,
+      })),
+      total: order.total ?? 0,
+      status: order.status ?? "Nuevo",
+      createdAt: order.createdAt ?? "",
+      stockCommitted: order.stockCommitted ?? false,
+    };
+  });
 }
 
 // Versiones anteriores a v0.9 guardaban las categorías como una lista plana de texto,
@@ -167,12 +255,17 @@ export const tenantNavItems: { id: TenantNavId; label: string; glyph: string }[]
 
 export const defaultTenantDemo: TenantDemoState = {
   products: [
-    { id: "prd_01", name: "Taza Dragon Ball", sku: "TAZ-DB-001", category: "Tazas", subcategory: "Dragon Ball", variant: "Cerámica · 325 ml", description: "Taza con diseño de Goku, ideal para fans de Dragon Ball.", image: "", stock: 8, minStock: 3, price: 12500, cost: 6900, published: true },
-    { id: "prd_02", name: "Vaso térmico Minnie", sku: "VAS-MN-002", category: "Vasos térmicos", subcategory: "", variant: "Acero · 500 ml", description: "Vaso térmico de acero con estampado de Minnie.", image: "", stock: 2, minStock: 3, price: 24500, cost: 14800, published: true },
-    { id: "prd_03", name: "Llavero Stitch", sku: "LLA-ST-003", category: "Llaveros", subcategory: "Disney", variant: "Acrílico · 6 cm", description: "Llavero acrílico de Stitch, línea Disney.", image: "", stock: 14, minStock: 5, price: 4800, cost: 2100, published: true },
-    { id: "prd_04", name: "Vinilo nombre personalizado", sku: "VIN-NO-004", category: "Vinilos", subcategory: "", variant: "20 × 8 cm", description: "", image: "", stock: 21, minStock: 6, price: 7200, cost: 2300, published: true },
-    { id: "prd_05", name: "Taza mágica personalizada", sku: "TAZ-MG-005", category: "Tazas", subcategory: "", variant: "Negra · 325 ml", description: "", image: "", stock: 0, minStock: 2, price: 15800, cost: 8500, published: false },
-    { id: "prd_06", name: "Botella infantil Disney", sku: "BOT-DI-006", category: "Botellas", subcategory: "", variant: "Aluminio · 600 ml", description: "Botella de aluminio con licencia Disney para chicos.", image: "", stock: 5, minStock: 2, price: 18900, cost: 10500, published: true },
+    { id: "prd_01", name: "Taza Dragon Ball", sku: "TAZ-DB-001", category: "Tazas", subcategory: "Dragon Ball", variant: "Cerámica · 325 ml", description: "Taza con diseño de Goku, ideal para fans de Dragon Ball.", image: "", stock: 8, minStock: 3, price: 12500, cost: 6900, published: true, hideWhenOutOfStock: true, variants: [] },
+    { id: "prd_02", name: "Vaso térmico Minnie", sku: "VAS-MN-002", category: "Vasos térmicos", subcategory: "", variant: "Acero · 500 ml", description: "Vaso térmico de acero con estampado de Minnie.", image: "", stock: 2, minStock: 3, price: 24500, cost: 14800, published: true, hideWhenOutOfStock: true, variants: [] },
+    { id: "prd_03", name: "Llavero Stitch", sku: "LLA-ST-003", category: "Llaveros", subcategory: "Disney", variant: "Acrílico · 6 cm", description: "Llavero acrílico de Stitch, línea Disney.", image: "", stock: 14, minStock: 5, price: 4800, cost: 2100, published: true, hideWhenOutOfStock: true, variants: [] },
+    { id: "prd_04", name: "Vinilo nombre personalizado", sku: "VIN-NO-004", category: "Vinilos", subcategory: "", variant: "20 × 8 cm", description: "", image: "", stock: 21, minStock: 6, price: 7200, cost: 2300, published: true, hideWhenOutOfStock: true, variants: [] },
+    { id: "prd_05", name: "Taza mágica personalizada", sku: "TAZ-MG-005", category: "Tazas", subcategory: "", variant: "Negra · 325 ml", description: "Se prepara fría y el diseño aparece con el calor de la bebida.", image: "", stock: 0, minStock: 2, price: 15800, cost: 8500, published: true, hideWhenOutOfStock: false, variants: [] },
+    { id: "prd_06", name: "Botella infantil Disney", sku: "BOT-DI-006", category: "Botellas", subcategory: "", variant: "Aluminio · 600 ml", description: "Botella de aluminio con licencia Disney para chicos.", image: "", stock: 5, minStock: 2, price: 18900, cost: 10500, published: true, hideWhenOutOfStock: true, variants: [] },
+    { id: "prd_07", name: "Llavero Dragon Ball", sku: "LLA-DB-007", category: "Llaveros", subcategory: "Dragon Ball", variant: "Acrílico · 6 cm", description: "Elegí tu personaje favorito de Dragon Ball.", image: "", stock: 9, minStock: 5, price: 4800, cost: 2100, published: true, hideWhenOutOfStock: true, variants: [
+      { id: "var_goku", name: "Goku", image: "", price: 4800, cost: 2100, stock: 6, minStock: 2 },
+      { id: "var_krillin", name: "Krillin", image: "", price: 4800, cost: 2100, stock: 3, minStock: 2 },
+      { id: "var_roshi", name: "Maestro Roshi", image: "", price: 5200, cost: 2400, stock: 0, minStock: 2 },
+    ] },
   ],
   customers: [
     { id: "cli_01", name: "Camila Torres", phone: "+54 9 11 6123-4490", email: "camila@email.com", notes: "Prefiere retirar por la tarde." },
@@ -206,8 +299,12 @@ export const defaultTenantDemo: TenantDemoState = {
     { name: "Tazas", subcategories: [{ name: "Dragon Ball", keywords: ["Dragon Ball", "Goku", "Vegeta", "Krillin", "Piccolo"] }] },
     { name: "Vasos térmicos", subcategories: [] },
     { name: "Vinilos", subcategories: [] },
-    { name: "Llaveros", subcategories: [{ name: "Disney", keywords: ["Disney", "Stitch", "Minnie", "Mickey"] }] },
+    { name: "Llaveros", subcategories: [{ name: "Disney", keywords: ["Disney", "Stitch", "Minnie", "Mickey"] }, { name: "Dragon Ball", keywords: ["Dragon Ball", "Goku", "Vegeta", "Krillin", "Piccolo", "Maestro Roshi"] }] },
     { name: "Botellas", subcategories: [] },
     { name: "Otros", subcategories: [] },
+  ],
+  stockRequests: [
+    { id: "req_01", productId: "prd_05", productName: "Taza mágica personalizada", variantId: "", variantName: "", customerName: "Julieta Fernández", customerPhone: "+54 9 11 4400-2210", createdAt: "Hoy, 11:05" },
+    { id: "req_02", productId: "prd_07", productName: "Llavero Dragon Ball", variantId: "var_roshi", variantName: "Maestro Roshi", customerName: "Braian Sosa", customerPhone: "+54 9 11 5522-9081", createdAt: "Ayer, 20:14" },
   ],
 };

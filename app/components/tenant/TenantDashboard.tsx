@@ -1,6 +1,6 @@
 "use client";
 
-import type { Order, TenantDemoState, TenantNavId } from "../../data/tenant-demo";
+import { productLowStock, productStock, type Order, type TenantDemoState, type TenantNavId } from "../../data/tenant-demo";
 import { AppIcon } from "../ui/AppIcon";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
@@ -19,7 +19,7 @@ export function TenantDashboard({ state, onNavigate }: { state: TenantDemoState;
   const delivered = state.orders.filter((order) => order.status === "Entregado");
   const sales = delivered.reduce((total, order) => total + order.total, 0);
   const estimatedCost = delivered.reduce((total, order) => total + orderCost(order, state), 0);
-  const lowStock = state.products.filter((product) => product.stock <= product.minStock);
+  const lowStock = state.products.filter(productLowStock);
   const openOrders = state.orders.filter((order) => !["Entregado", "Cancelado"].includes(order.status));
 
   const chartOrders = state.orders.slice(0, 6).slice().reverse();
@@ -62,7 +62,7 @@ export function TenantDashboard({ state, onNavigate }: { state: TenantDemoState;
     </section>
     <div className="dashboard-grid tenant-dashboard-grid">
       <section className="panel"><div className="panel-title"><div><h2>Pedidos recientes</h2><p>Seguimiento rápido de la preparación y entrega.</p></div><button className="link-button" onClick={() => onNavigate("pedidos")}>Ver todos →</button></div><div className="compact-list">{state.orders.slice(0, 4).map((order) => <article className="compact-row" key={order.id}><span className="order-code">{order.id}</span><div><strong>{order.customerName}</strong><small>{orderSummary(order)}</small></div><b>{money.format(order.total)}</b><span className={`status status-${order.status.toLowerCase()}`}>{order.status}</span></article>)}</div></section>
-      <section className="panel"><div className="panel-title"><div><h2>Atención de stock</h2><p>Productos en el mínimo configurado o sin unidades.</p></div><button className="link-button" onClick={() => onNavigate("inventario")}>Gestionar →</button></div><div className="compact-list">{lowStock.map((product) => <article className="stock-alert-row" key={product.id}><span className={product.stock === 0 ? "stock-dot empty" : "stock-dot"}>{product.stock}</span><div><strong>{product.name}</strong><small>Mínimo configurado: {product.minStock}</small></div><span className={product.stock === 0 ? "status danger" : "status neutral"}>{product.stock === 0 ? "Sin stock" : "Stock bajo"}</span></article>)}{lowStock.length === 0 && <div className="empty-state">No hay alertas de stock.</div>}</div></section>
+      <section className="panel"><div className="panel-title"><div><h2>Atención de stock</h2><p>Productos en el mínimo configurado o sin unidades.</p></div><button className="link-button" onClick={() => onNavigate("inventario")}>Gestionar →</button></div><div className="compact-list">{lowStock.map((product) => { const stock = productStock(product); return <article className="stock-alert-row" key={product.id}><span className={stock === 0 ? "stock-dot empty" : "stock-dot"}>{stock}</span><div><strong>{product.name}</strong><small>{product.variants.length > 0 ? "Alguna variante en el mínimo" : `Mínimo configurado: ${product.minStock}`}</small></div><span className={stock === 0 ? "status danger" : "status neutral"}>{stock === 0 ? "Sin stock" : "Stock bajo"}</span></article>; })}{lowStock.length === 0 && <div className="empty-state">No hay alertas de stock.</div>}</div></section>
     </div>
     <div className="quick-actions tenant-quick-actions"><button onClick={() => onNavigate("inventario")}><span><AppIcon name="inventory" /></span><div><strong>Cargar producto</strong><small>Sumá un artículo o una nueva variante</small></div><b>→</b></button><button onClick={() => onNavigate("clientes")}><span><AppIcon name="customers" /></span><div><strong>Agendar cliente</strong><small>Guardá sus datos y preferencias</small></div><b>→</b></button><button onClick={() => onNavigate("portal")}><span><AppIcon name="portal" /></span><div><strong>Editar vidriera</strong><small>Actualizá el banner y los productos</small></div><b>→</b></button></div>
   </>;
