@@ -10,6 +10,7 @@ const description = "Nexo reúne la gestión de productos, stock, clientes, pedi
 export const metadata: Metadata = {
   title: "Nexo — Gestión para emprendimientos",
   description,
+  icons: { icon: "/nexo-icon.png", shortcut: "/nexo-icon.png", apple: "/nexo-icon.png" },
   openGraph: {
     title: "Nexo — Gestión para emprendimientos",
     description,

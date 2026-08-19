@@ -1,4 +1,4 @@
-# Nexo v1.0.6
+# Nexo v1.0.7
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -187,6 +187,11 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - botón "Quiénes somos" agregado junto a Términos de uso y Privacidad, en el pie del portal público;
 - desde Portal de ventas, nueva sección "Acerca de nosotros" para escribir el texto de presentación, subir una foto y anotar la ubicación o zona de envíos — todo editable por la clienta;
 - al hacer clic en "Quiénes somos" en la tienda pública, se abre una ventana con esa foto, el texto y un botón directo para escribir por WhatsApp.
+
+### Ícono de pestaña (favicon) 1.0.7
+
+- el ícono que se ve en la pestaña del navegador ahora es el ícono de Nexo, tanto en el login como en el panel del emprendimiento y la superadministración;
+- en cada tienda pública (`/tienda/[slug]`) el ícono de la pestaña pasa a ser el logo propio del emprendimiento (el mismo que se sube en Ajustes); si todavía no subieron uno, se ve el ícono de Nexo.
 
 ## Configuración
 

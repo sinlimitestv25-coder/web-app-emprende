@@ -143,6 +143,16 @@ export function PublicStore({ slug }: { slug: string }) {
     return () => window.clearInterval(timer);
   }, [banners.length]);
 
+  useEffect(() => {
+    let link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = portal.logo || "/nexo-icon.png";
+  }, [portal.logo]);
+
   function openBanner(banner: Banner) {
     if (banner.linkType === "category") { setCategoryFilter(banner.linkValue); setSearchText(""); }
     else if (banner.linkType === "subcategory" || banner.linkType === "keyword") { setCategoryFilter(""); setSearchText(banner.linkValue); }
