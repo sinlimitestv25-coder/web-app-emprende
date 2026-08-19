@@ -11,6 +11,7 @@ import { Plans } from "./modules/Plans";
 import { Activity } from "./modules/Activity";
 import { TenantApp } from "./tenant/TenantApp";
 import { AppIcon } from "./ui/AppIcon";
+import { LegalFooter } from "./ui/LegalFooter";
 
 export function AppShell() {
   const [active, setActive] = useState<NavId>("resumen");
@@ -108,6 +109,7 @@ export function AppShell() {
           {active === "actividad" && <Activity />}
           {active === "configuracion" && <Settings />}
         </section>
+        <LegalFooter />
       </main>
     </div>
   );

@@ -1,4 +1,4 @@
-# Nexo v1.0.2
+# Nexo v1.0.3
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -164,6 +164,12 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 
 - "Armar pedido" ya no exige elegir un cliente: hay una opción "Venta directa (sin cliente)" arriba de la lista, pensada para cuando cargás una venta de feria sin pedirle el nombre a la persona — el pedido queda a nombre de "Vendedora";
 - si el pedido no tiene cliente (o el cliente no tiene teléfono cargado), el botón de WhatsApp de esa fila en Pedidos aparece apagado en vez de abrir un enlace roto.
+
+### Pie de página legal y logo redondo 1.0.3
+
+- pie de página con "Términos de uso" y "Privacidad" agregado al final del panel del emprendimiento y de la superadministración (antes solo estaba en el login); al hacer clic se abre una ventana con el texto correspondiente;
+- los enlaces de Términos y Privacidad del login ahora también abren esa misma ventana con el contenido, en vez de ser texto decorativo;
+- el logo del emprendimiento en el sidebar pasó a mostrarse siempre redondo (círculo completo), recortando la imagen para llenar el marco en vez de dejar un fondo oscuro asomando alrededor cuando el sidebar se expande.
 
 ## Configuración
 

@@ -3,12 +3,14 @@
 import { useState, type FormEvent } from "react";
 import { getSupabase, isSupabaseConfigured, requirePlatformAdmin } from "../../lib/supabase";
 import { version } from "../../../package.json";
+import { LegalModal, type LegalDoc } from "../ui/LegalFooter";
 
 export function LoginScreen({ onDemo, onSignedIn }: { onDemo: (view: "platform" | "tenant") => void; onSignedIn: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [legalOpen, setLegalOpen] = useState<LegalDoc | null>(null);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -61,11 +63,12 @@ export function LoginScreen({ onDemo, onSignedIn }: { onDemo: (view: "platform" 
           </div>
           <small>{isSupabaseConfigured ? "Conexión Supabase disponible" : "Demostración local · Supabase pendiente de vinculación"}</small>
           <div className="login-footer">
-            <div className="login-footer-links"><span>Términos de uso</span><span>Privacidad</span></div>
+            <div className="login-footer-links"><button type="button" onClick={() => setLegalOpen("terminos")}>Términos de uso</button><button type="button" onClick={() => setLegalOpen("privacidad")}>Privacidad</button></div>
             <p>© CIR Soluciones Digitales · v{version}</p>
           </div>
         </form>
       </section>
+      {legalOpen && <LegalModal doc={legalOpen} onClose={() => setLegalOpen(null)} />}
     </main>
   );
 }

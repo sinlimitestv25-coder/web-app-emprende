@@ -9,6 +9,7 @@ import { TenantOrders } from "./TenantOrders";
 import { TenantPortal } from "./TenantPortal";
 import { TenantSettings } from "./TenantSettings";
 import { AppIcon } from "../ui/AppIcon";
+import { LegalFooter } from "../ui/LegalFooter";
 
 export function TenantApp({ onExit }: { onExit: () => void }) {
   const [active, setActive] = useState<TenantNavId>("inicio");
@@ -138,6 +139,7 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
           {active === "portal" && <TenantPortal state={state} setState={setState} flash={flash} />}
           {active === "ajustes" && <TenantSettings state={state} setState={setState} flash={flash} resetDemo={resetDemo} />}
         </section>
+        <LegalFooter />
       </main>
     </div>
   );
