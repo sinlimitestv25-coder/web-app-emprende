@@ -62,6 +62,25 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
     setDraft((current) => ({ ...current, banners: current.banners.filter((_, itemIndex) => itemIndex !== index) }));
   }
 
+  async function handleAboutImage(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    const result = await prepareImage(file);
+    if (!result.ok) {
+      if (result.reason === "not-image") flash("Elegí un archivo de imagen.");
+      else if (result.reason === "too-large") flash("Esta imagen pesa demasiado incluso comprimida. Probá con otra.");
+      else flash("No se pudo leer la imagen.");
+      return;
+    }
+    setDraft((current) => ({ ...current, aboutImage: result.dataUrl }));
+    if (result.compressed) flash("La imagen pesaba de más: se comprimió automáticamente para poder subirla.");
+  }
+
+  function removeAboutImage() {
+    setDraft((current) => ({ ...current, aboutImage: "" }));
+  }
+
   function updateBanner(index: number, patch: Partial<Banner>) {
     setDraft((current) => ({ ...current, banners: current.banners.map((banner, itemIndex) => itemIndex === index ? { ...banner, ...patch } : banner) }));
   }
@@ -144,6 +163,26 @@ export function TenantPortal({ state, setState, flash }: { state: TenantDemoStat
           </label>
         </div>
         {draft.banners.length === 0 && <p className="portal-banner-empty">Todavía no subiste imágenes. Mientras tanto se muestra un fondo de color en el banner.</p>}
+      </section>
+
+      <section className="panel">
+        <div className="panel-title"><div><h2>Acerca de nosotros</h2><p>Se ve en tu tienda pública, en un botón junto a Términos y Privacidad.</p></div></div>
+        <div className="portal-form">
+          <label>Quiénes somos<textarea value={draft.about} onChange={(event) => setDraft({ ...draft, about: event.target.value })} placeholder="Contales quién sos, cómo trabajás, qué te hace especial…" /></label>
+          <label>Ubicación / envíos<input value={draft.aboutLocation} onChange={(event) => setDraft({ ...draft, aboutLocation: event.target.value })} placeholder="Ej. Envíos a todo el país · Retiro en Avellaneda" /></label>
+        </div>
+        <div className="image-upload settings-logo-upload">
+          {draft.aboutImage
+            ? <img src={draft.aboutImage} alt="" className="image-upload-preview" />
+            : <div className="image-upload-placeholder">Sin foto</div>}
+          <div className="image-upload-actions">
+            <label className="button secondary image-upload-button">
+              Subir foto
+              <input type="file" accept="image/*" onChange={handleAboutImage} hidden />
+            </label>
+            {draft.aboutImage && <button type="button" className="link-button" onClick={removeAboutImage}>Quitar</button>}
+          </div>
+        </div>
       </section>
     </div>
 

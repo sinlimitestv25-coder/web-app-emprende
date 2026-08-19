@@ -1,4 +1,4 @@
-# Nexo v1.0.4
+# Nexo v1.0.6
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -176,6 +176,17 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - corregido el nombre del desarrollador: "C&R Soluciones Digitales" (antes decía "CIR" por error);
 - en las tres pantallas (login, emprendimiento y superadministración) el pie de página ahora queda separado en dos columnas: "C&R Soluciones Digitales · versión" a la izquierda, "Términos de uso" y "Privacidad" a la derecha;
 - texto del pie de página un poco más grande para que se lea mejor.
+
+### Pie de página también en el portal público 1.0.5
+
+- el portal público (`/tienda/[slug]`) ahora también tiene, bien abajo, "C&R Soluciones Digitales · versión" y los enlaces de Términos de uso y Privacidad (antes solo estaban en el login y en los paneles internos);
+- letra del pie de página un poco más grande en las cuatro pantallas (login, emprendimiento, superadministración y portal público).
+
+### "Quiénes somos" en el portal 1.0.6
+
+- botón "Quiénes somos" agregado junto a Términos de uso y Privacidad, en el pie del portal público;
+- desde Portal de ventas, nueva sección "Acerca de nosotros" para escribir el texto de presentación, subir una foto y anotar la ubicación o zona de envíos — todo editable por la clienta;
+- al hacer clic en "Quiénes somos" en la tienda pública, se abre una ventana con esa foto, el texto y un botón directo para escribir por WhatsApp.
 
 ## Configuración
 

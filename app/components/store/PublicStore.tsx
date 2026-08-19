@@ -18,6 +18,9 @@ import {
   type StockRequest,
   type TenantDemoState,
 } from "../../data/tenant-demo";
+import { LegalModal, type LegalDoc } from "../ui/LegalFooter";
+import { AppIcon } from "../ui/AppIcon";
+import { version } from "../../../package.json";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
 const slideIntervalMs = 5000;
@@ -67,6 +70,8 @@ export function PublicStore({ slug }: { slug: string }) {
   const [notifyFor, setNotifyFor] = useState<{ product: Product; variant: ProductVariant | null } | null>(null);
   const [requestName, setRequestName] = useState("");
   const [requestPhone, setRequestPhone] = useState("");
+  const [legalOpen, setLegalOpen] = useState<LegalDoc | null>(null);
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(tenantStorageKey);
@@ -356,8 +361,30 @@ export function PublicStore({ slug }: { slug: string }) {
       </section>
 
       <footer className="public-store-footer">
-        <p>Catálogo de prueba gestionado con Nexo. Los pedidos se coordinan por WhatsApp.</p>
+        <p className="public-store-footer-note">Catálogo de prueba gestionado con Nexo. Los pedidos se coordinan por WhatsApp.</p>
+        <div className="public-store-footer-bottom">
+          <p>© C&amp;R Soluciones Digitales · v{version}</p>
+          <div className="public-store-footer-links">
+            <button type="button" onClick={() => setAboutOpen(true)}>Quiénes somos</button>
+            <button type="button" onClick={() => setLegalOpen("terminos")}>Términos de uso</button>
+            <button type="button" onClick={() => setLegalOpen("privacidad")}>Privacidad</button>
+          </div>
+        </div>
       </footer>
+      {legalOpen && <LegalModal doc={legalOpen} onClose={() => setLegalOpen(null)} />}
+      {aboutOpen && (
+        <div className="public-store-modal-backdrop" onMouseDown={() => setAboutOpen(false)}>
+          <div className="public-store-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="public-store-modal-close" type="button" onClick={() => setAboutOpen(false)} aria-label="Cerrar">×</button>
+            <span className="public-store-eyebrow">Quiénes somos</span>
+            <h2>{portal.storeName}</h2>
+            {portal.aboutImage && <img src={portal.aboutImage} alt="" className="public-store-about-image" />}
+            {portal.about && <p className="public-store-about-text">{portal.about}</p>}
+            {portal.aboutLocation && <p className="public-store-about-location"><AppIcon name="globe" /> {portal.aboutLocation}</p>}
+            <a className="public-store-checkout" href={`https://wa.me/${portal.whatsapp}`} target="_blank" rel="noreferrer">Escribinos por WhatsApp</a>
+          </div>
+        </div>
+      )}
 
       {cartOpen && (
         <div className="public-store-modal-backdrop" onMouseDown={() => setCartOpen(false)}>
