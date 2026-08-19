@@ -63,8 +63,8 @@ export function LoginScreen({ onDemo, onSignedIn }: { onDemo: (view: "platform" 
           </div>
           <small>{isSupabaseConfigured ? "Conexión Supabase disponible" : "Demostración local · Supabase pendiente de vinculación"}</small>
           <div className="login-footer">
+            <p>© C&amp;R Soluciones Digitales · v{version}</p>
             <div className="login-footer-links"><button type="button" onClick={() => setLegalOpen("terminos")}>Términos de uso</button><button type="button" onClick={() => setLegalOpen("privacidad")}>Privacidad</button></div>
-            <p>© CIR Soluciones Digitales · v{version}</p>
           </div>
         </form>
       </section>

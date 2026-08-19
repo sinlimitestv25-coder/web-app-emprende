@@ -1,4 +1,4 @@
-# Nexo v1.0.3
+# Nexo v1.0.4
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -170,6 +170,12 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - pie de página con "Términos de uso" y "Privacidad" agregado al final del panel del emprendimiento y de la superadministración (antes solo estaba en el login); al hacer clic se abre una ventana con el texto correspondiente;
 - los enlaces de Términos y Privacidad del login ahora también abren esa misma ventana con el contenido, en vez de ser texto decorativo;
 - el logo del emprendimiento en el sidebar pasó a mostrarse siempre redondo (círculo completo), recortando la imagen para llenar el marco en vez de dejar un fondo oscuro asomando alrededor cuando el sidebar se expande.
+
+### Ajustes del pie de página 1.0.4
+
+- corregido el nombre del desarrollador: "C&R Soluciones Digitales" (antes decía "CIR" por error);
+- en las tres pantallas (login, emprendimiento y superadministración) el pie de página ahora queda separado en dos columnas: "C&R Soluciones Digitales · versión" a la izquierda, "Términos de uso" y "Privacidad" a la derecha;
+- texto del pie de página un poco más grande para que se lea mejor.
 
 ## Configuración
 

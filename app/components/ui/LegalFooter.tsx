@@ -12,7 +12,7 @@ const legalContent: Record<LegalDoc, { title: string; body: string[] }> = {
       "Nexo es una plataforma de gestión para emprendimientos: alta de productos, clientes, proveedores, pedidos y un portal de ventas público por emprendimiento.",
       "Esta versión funciona como demostración: los datos de prueba se guardan únicamente en este navegador y pueden restablecerse en cualquier momento desde Ajustes, sin afectar a otros dispositivos ni usuarios.",
       "El uso de la plataforma implica aceptar que la información cargada es responsabilidad de quien administra cada emprendimiento, y que Nexo no interviene en las ventas, pagos ni acuerdos entre el emprendimiento y sus clientes.",
-      "CIR Soluciones Digitales podrá actualizar estos términos a medida que se incorporen nuevas funciones. Ante cualquier duda, podés escribirnos por los canales de contacto habituales.",
+      "C&R Soluciones Digitales podrá actualizar estos términos a medida que se incorporen nuevas funciones. Ante cualquier duda, podés escribirnos por los canales de contacto habituales.",
     ],
   },
   privacidad: {
@@ -47,11 +47,11 @@ export function LegalFooter() {
   return (
     <>
       <footer className="app-footer">
+        <p>© C&amp;R Soluciones Digitales · v{version}</p>
         <div className="app-footer-links">
           <button type="button" onClick={() => setOpen("terminos")}>Términos de uso</button>
           <button type="button" onClick={() => setOpen("privacidad")}>Privacidad</button>
         </div>
-        <p>© CIR Soluciones Digitales · v{version}</p>
       </footer>
       {open && <LegalModal doc={open} onClose={() => setOpen(null)} />}
     </>
