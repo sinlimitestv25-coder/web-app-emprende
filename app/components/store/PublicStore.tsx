@@ -189,6 +189,8 @@ export function PublicStore({ slug }: { slug: string }) {
       status: "Nuevo",
       createdAt: "Portal · ahora",
       stockCommitted: false,
+      channel: "portal",
+      location: "",
     };
 
     const updated: TenantDemoState = { ...latest, customers, orders: [newOrder, ...latest.orders] };
