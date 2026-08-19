@@ -1,4 +1,4 @@
-# Nexo v1.0.7
+# Nexo v1.0.8
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -192,6 +192,10 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 
 - el ícono que se ve en la pestaña del navegador ahora es el ícono de Nexo, tanto en el login como en el panel del emprendimiento y la superadministración;
 - en cada tienda pública (`/tienda/[slug]`) el ícono de la pestaña pasa a ser el logo propio del emprendimiento (el mismo que se sube en Ajustes); si todavía no subieron uno, se ve el ícono de Nexo.
+
+### Aviso de medios de pago 1.0.8
+
+- en el carrito del portal público, antes de enviar el pedido por WhatsApp, se agregó el aviso "Aceptamos todos los medios de pago — a convenir y confirmar con la vendedora."
 
 ## Configuración
 

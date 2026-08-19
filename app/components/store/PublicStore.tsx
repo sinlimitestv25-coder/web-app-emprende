@@ -417,6 +417,7 @@ export function PublicStore({ slug }: { slug: string }) {
               <div className="public-store-buyer-form">
                 <label>Tu nombre<input value={buyerName} onChange={(event) => setBuyerName(event.target.value)} placeholder="Nombre y apellido" /></label>
                 <label>Tu WhatsApp<input value={buyerPhone} onChange={(event) => setBuyerPhone(event.target.value)} placeholder="+54 9…" /></label>
+                <p className="public-store-payment-note">Aceptamos todos los medios de pago — a convenir y confirmar con la vendedora.</p>
                 <button type="button" className="public-store-checkout" onClick={checkout}>
                   Enviar pedido por WhatsApp
                 </button>
