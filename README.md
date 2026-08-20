@@ -1,4 +1,4 @@
-# Nexo v1.2.0
+# Nexo v1.2.1
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -220,6 +220,11 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - **medio de pago** en el carrito: "Transferencia" ya funciona (al elegirla, avisa que se coordina el alias por WhatsApp); Mercado Pago, efectivo y tarjeta se ven marcados "Próximamente" — activarlos de verdad necesita conectar cada uno por separado más adelante;
 - el pedido que llega por WhatsApp ahora incluye si es envío o retiro, el medio de pago elegido, y el total con envío incluido;
 - la ventana del carrito se agrandó un poco para que entre todo cómodo.
+
+### Corrección de alineación en el catálogo 1.2.1
+
+- cuando un producto tiene un nombre más largo (por ejemplo, se va a dos líneas), la tarjeta ya no queda más alta que las demás ni desalinea el precio y el botón de las tarjetas vecinas — todas las tarjetas de una fila quedan parejas;
+- "Consultar por WhatsApp" pasó a ser un botón redondo con el ícono de WhatsApp, del mismo tamaño que "Agregar", pegado al lado — ya no se estira ni cambia de forma al cambiar entre lista, mosaico grande o mosaico chico.
 
 ## Configuración
 

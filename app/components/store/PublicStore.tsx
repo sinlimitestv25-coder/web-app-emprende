@@ -409,11 +409,13 @@ export function PublicStore({ slug }: { slug: string }) {
                 )}
                 <footer>
                   <b>{money.format(price)}</b>
-                  {outOfStock
-                    ? <button type="button" className="public-store-notify" onClick={() => setNotifyFor({ product, variant })}>Avisame</button>
-                    : <button type="button" onClick={() => add(product, variant)}>Agregar +</button>}
+                  <div className="public-store-card-actions">
+                    {outOfStock
+                      ? <button type="button" className="public-store-notify" onClick={() => setNotifyFor({ product, variant })}>Avisame</button>
+                      : <button type="button" onClick={() => add(product, variant)}>Agregar +</button>}
+                    <a className="public-store-consult" href={consultUrl(product)} target="_blank" rel="noreferrer" aria-label={`Consultar por WhatsApp sobre ${product.name}`} title="Consultar por WhatsApp"><AppIcon name="whatsapp" /></a>
+                  </div>
                 </footer>
-                <a className="public-store-consult" href={consultUrl(product)} target="_blank" rel="noreferrer">Consultar por WhatsApp</a>
               </article>
             );
           })}
