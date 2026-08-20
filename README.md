@@ -1,4 +1,4 @@
-# Nexo v1.1.0
+# Nexo v1.1.1
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -207,6 +207,11 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 - la franja de botones sobre el banner del portal ahora queda alineada a la derecha (antes centrada);
 - nuevo botón "Preguntas frecuentes" junto a "Quiénes somos", que abre una lista desplegable de preguntas y respuestas;
 - desde Ajustes → Preguntas frecuentes, se cargan, editan y quitan las preguntas — vienen 4 de ejemplo (medios de pago, envíos, retiro y personalizados) para que se vea el formato; el botón del portal se oculta solo si no hay ninguna cargada.
+
+### Acerca de nosotros pasó a Ajustes 1.1.1
+
+- "Acerca de nosotros" (texto, foto y ubicación) se movió de Portal de ventas a Ajustes, justo arriba de Preguntas frecuentes, para que quede todo junto;
+- en Ajustes, los cambios de "Acerca de nosotros" se guardan al toque (como el logo y las categorías), sin necesidad de tocar "Guardar y publicar".
 
 ## Configuración
 

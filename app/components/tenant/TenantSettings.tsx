@@ -33,6 +33,26 @@ export function TenantSettings({ state, setState, flash, resetDemo }: { state: T
     flash("Logo quitado.");
   }
 
+  async function handleAboutImage(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    const result = await prepareImage(file);
+    if (!result.ok) {
+      if (result.reason === "not-image") flash("Elegí un archivo de imagen.");
+      else if (result.reason === "too-large") flash("Esta imagen pesa demasiado incluso comprimida. Probá con otra.");
+      else flash("No se pudo leer la imagen.");
+      return;
+    }
+    setState((current) => ({ ...current, portal: { ...current.portal, aboutImage: result.dataUrl } }));
+    flash(result.compressed ? "Foto actualizada: se comprimió automáticamente." : "Foto actualizada.");
+  }
+
+  function removeAboutImage() {
+    setState((current) => ({ ...current, portal: { ...current.portal, aboutImage: "" } }));
+    flash("Foto quitada.");
+  }
+
   function addCategory(event: FormEvent) {
     event.preventDefault();
     const name = newCategory.trim();
@@ -138,6 +158,26 @@ export function TenantSettings({ state, setState, flash, resetDemo }: { state: T
           <input value={newCategory} onChange={(event) => setNewCategory(event.target.value)} placeholder="Nueva categoría" />
           <button className="button secondary" type="submit">+ Agregar categoría</button>
         </form>
+      </div>
+    </section>
+
+    <section className="panel">
+      <div className="panel-title"><div><h2>Acerca de nosotros</h2><p>Se ve en tu tienda pública, en el botón "Quiénes somos" arriba del banner.</p></div></div>
+      <div className="portal-form">
+        <label>Quiénes somos<textarea value={state.portal.about} onChange={(event) => setState((current) => ({ ...current, portal: { ...current.portal, about: event.target.value } }))} placeholder="Contales quién sos, cómo trabajás, qué te hace especial…" /></label>
+        <label>Ubicación / envíos<input value={state.portal.aboutLocation} onChange={(event) => setState((current) => ({ ...current, portal: { ...current.portal, aboutLocation: event.target.value } }))} placeholder="Ej. Envíos a todo el país · Retiro en Avellaneda" /></label>
+      </div>
+      <div className="image-upload settings-logo-upload">
+        {state.portal.aboutImage
+          ? <img src={state.portal.aboutImage} alt="" className="image-upload-preview" />
+          : <div className="image-upload-placeholder">Sin foto</div>}
+        <div className="image-upload-actions">
+          <label className="button secondary image-upload-button">
+            Subir foto
+            <input type="file" accept="image/*" onChange={handleAboutImage} hidden />
+          </label>
+          {state.portal.aboutImage && <button type="button" className="link-button" onClick={removeAboutImage}>Quitar</button>}
+        </div>
       </div>
     </section>
 
