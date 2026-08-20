@@ -266,8 +266,9 @@ button { color: inherit; }
 .public-store-header { position:sticky; top:0; z-index:5; height:74px; padding:0 6%; display:flex; align-items:center; justify-content:space-between; background:rgba(255,253,250,.94); backdrop-filter:blur(6px); border-bottom:1px solid #eee9e1; }
 .public-store-logo { color:var(--store-accent); font-size:22px; font-style:italic; }
 .public-store-logo span { display:block; margin-top:2px; color:#68726e; font-family:var(--font-geist-sans),Arial,sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; }
-.public-store-cart-button { border:1px solid #ddd9d3; border-radius:999px; padding:10px 16px; background:white; color:#2c312e; font:600 13px var(--font-geist-sans),Arial,sans-serif; cursor:pointer; }
-.public-store-cart-button b { margin-left:8px; padding:3px 8px; border-radius:999px; color:white; background:var(--store-accent); }
+.public-store-cart-button { display:inline-flex; align-items:center; gap:8px; border:1px solid #ddd9d3; border-radius:999px; padding:10px 16px; background:white; color:#2c312e; font:600 13px var(--font-geist-sans),Arial,sans-serif; cursor:pointer; }
+.public-store-cart-button .app-icon { font-size:16px; color:var(--store-accent); }
+.public-store-cart-button b { margin-left:2px; padding:3px 8px; border-radius:999px; color:white; background:var(--store-accent); }
 .public-store-quicklinks { padding:16px 6%; display:flex; flex-wrap:wrap; gap:12px; justify-content:flex-end; background:#fffdfa; }
 .public-store-quicklinks button { display:flex; align-items:center; gap:9px; border:1px solid #ddd9d3; border-radius:999px; padding:13px 22px; background:white; color:#2c312e; font:600 14px var(--font-geist-sans),Arial,sans-serif; cursor:pointer; transition:border-color .15s ease,color .15s ease; }
 .public-store-quicklinks button:hover { border-color:var(--store-accent); color:var(--store-accent); }
@@ -300,10 +301,11 @@ button { color: inherit; }
 .public-store-card.tone-3 .public-store-thumb { background:#9fbfd4; }
 .public-store-card strong { display:block; margin:14px 16px 0; font-size:15px; font-weight:600; font-family:var(--font-geist-sans),Arial,sans-serif; }
 .public-store-card p { margin:5px 16px 0; color:var(--muted); font:400 12px var(--font-geist-sans),Arial,sans-serif; }
-.public-store-card footer { margin-top:auto; padding:14px 16px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.public-store-card footer { margin-top:auto; padding:14px 16px 16px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; }
 .public-store-card footer b { font:700 15px var(--font-geist-sans),Arial,sans-serif; }
 .public-store-card-actions { display:flex; align-items:center; gap:8px; }
-.public-store-card footer button { border:1px solid #ddd9d3; border-radius:999px; padding:8px 14px; background:white; color:var(--store-accent); font:650 12px var(--font-geist-sans),Arial,sans-serif; cursor:pointer; white-space:nowrap; }
+.public-store-card footer button { display:inline-flex; align-items:center; gap:6px; border:1px solid #ddd9d3; border-radius:999px; padding:8px 14px; background:white; color:var(--store-accent); font:650 12px var(--font-geist-sans),Arial,sans-serif; cursor:pointer; white-space:nowrap; }
+.public-store-card footer button .app-icon { font-size:13px; }
 .public-store-consult { width:32px; height:32px; flex:0 0 auto; border:1px solid #ddd9d3; border-radius:50%; display:grid; place-items:center; background:white; color:#3a413d; text-decoration:none; }
 .public-store-consult:hover { border-color:#25d366; color:#25d366; }
 .public-store-consult .app-icon { font-size:15px; }

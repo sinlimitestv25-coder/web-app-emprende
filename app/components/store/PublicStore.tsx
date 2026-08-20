@@ -325,7 +325,7 @@ export function PublicStore({ slug }: { slug: string }) {
           <span>Detalles personalizados</span>
         </div>
         <button type="button" className="public-store-cart-button" onClick={() => setCartOpen(true)}>
-          Carrito <b>{cartCount}</b>
+          <AppIcon name="cart" /> Carrito <b>{cartCount}</b>
         </button>
       </header>
 
@@ -412,7 +412,7 @@ export function PublicStore({ slug }: { slug: string }) {
                   <div className="public-store-card-actions">
                     {outOfStock
                       ? <button type="button" className="public-store-notify" onClick={() => setNotifyFor({ product, variant })}>Avisame</button>
-                      : <button type="button" onClick={() => add(product, variant)}>Agregar +</button>}
+                      : <button type="button" onClick={() => add(product, variant)}><AppIcon name="cart" /> Agregar +</button>}
                     <a className="public-store-consult" href={consultUrl(product)} target="_blank" rel="noreferrer" aria-label={`Consultar por WhatsApp sobre ${product.name}`} title="Consultar por WhatsApp"><AppIcon name="whatsapp" /></a>
                   </div>
                 </footer>

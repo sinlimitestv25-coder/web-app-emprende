@@ -1,4 +1,4 @@
-# Nexo v1.2.1
+# Nexo v1.2.2
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -225,6 +225,11 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 
 - cuando un producto tiene un nombre más largo (por ejemplo, se va a dos líneas), la tarjeta ya no queda más alta que las demás ni desalinea el precio y el botón de las tarjetas vecinas — todas las tarjetas de una fila quedan parejas;
 - "Consultar por WhatsApp" pasó a ser un botón redondo con el ícono de WhatsApp, del mismo tamaño que "Agregar", pegado al lado — ya no se estira ni cambia de forma al cambiar entre lista, mosaico grande o mosaico chico.
+
+### Íconos de carrito de compras 1.2.2
+
+- el botón "Carrito" de arriba del portal ahora tiene el ícono de un carrito de compras dibujado, además del contador;
+- el botón "Agregar +" de cada producto también tiene el ícono del carrito, para que se vea junto al de Consultar por WhatsApp.
 
 ## Configuración
 

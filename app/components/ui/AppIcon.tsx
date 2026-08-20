@@ -32,6 +32,7 @@ const shapes: Record<string, ReactNode> = {
   question: <><path d="M8.5 8.7 9 7 11 5.7 13.5 6 15 7.5 15 9.3 13 10.8 12 12.2 12 14" /><circle cx="12" cy="17.3" r="1.1" fill="currentColor" stroke="none" /></>,
   gridSmall: <><rect x="3" y="3.5" width="5" height="5" rx="1" /><rect x="9.5" y="3.5" width="5" height="5" rx="1" /><rect x="16" y="3.5" width="5" height="5" rx="1" /><rect x="3" y="10" width="5" height="5" rx="1" /><rect x="9.5" y="10" width="5" height="5" rx="1" /><rect x="16" y="10" width="5" height="5" rx="1" /><rect x="3" y="16.5" width="5" height="5" rx="1" /><rect x="9.5" y="16.5" width="5" height="5" rx="1" /><rect x="16" y="16.5" width="5" height="5" rx="1" /></>,
   list: <><path d="M4 6.5h4M11 6.5h9" /><path d="M4 12h4M11 12h9" /><path d="M4 17.5h4M11 17.5h9" /></>,
+  cart: <><path d="M2.5 4h2.5l2 11h11.5" /><path d="M6 7h14l-1.8 7H8.3Z" /><circle cx="9.5" cy="19.3" r="1.4" fill="currentColor" stroke="none" /><circle cx="16.5" cy="19.3" r="1.4" fill="currentColor" stroke="none" /></>,
 };
 
 export function AppIcon({ name, className = "", label }: { name: string; className?: string; label?: string }) {
