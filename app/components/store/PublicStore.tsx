@@ -289,6 +289,10 @@ export function PublicStore({ slug }: { slug: string }) {
         </button>
       </header>
 
+      <div className="public-store-quicklinks">
+        <button type="button" onClick={() => setAboutOpen(true)}><AppIcon name="customers" /> Quiénes somos</button>
+      </div>
+
       <section className="public-store-hero">
         {banners.length > 0 && (
           <div className="public-store-hero-slides">
@@ -375,7 +379,6 @@ export function PublicStore({ slug }: { slug: string }) {
         <div className="public-store-footer-bottom">
           <p>© C&amp;R Soluciones Digitales · v{version}</p>
           <div className="public-store-footer-links">
-            <button type="button" onClick={() => setAboutOpen(true)}>Quiénes somos</button>
             <button type="button" onClick={() => setLegalOpen("terminos")}>Términos de uso</button>
             <button type="button" onClick={() => setLegalOpen("privacidad")}>Privacidad</button>
           </div>
