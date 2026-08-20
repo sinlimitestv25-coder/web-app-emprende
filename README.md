@@ -1,4 +1,4 @@
-# Nexo v1.0.8
+# Nexo v1.1.0
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -196,6 +196,17 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 ### Aviso de medios de pago 1.0.8
 
 - en el carrito del portal público, antes de enviar el pedido por WhatsApp, se agregó el aviso "Aceptamos todos los medios de pago — a convenir y confirmar con la vendedora."
+
+### Barra de botones sobre el banner 1.0.9
+
+- nueva franja entre el encabezado (nombre de la tienda) y el banner, con botones grandes tipo píldora — por ahora solo "Quiénes somos" (se sacó del pie de página, donde quedaban chicos);
+- pensada para sumar más botones ahí mismo (por ejemplo "Preguntas frecuentes") a medida que se agreguen.
+
+### Preguntas frecuentes 1.1.0
+
+- la franja de botones sobre el banner del portal ahora queda alineada a la derecha (antes centrada);
+- nuevo botón "Preguntas frecuentes" junto a "Quiénes somos", que abre una lista desplegable de preguntas y respuestas;
+- desde Ajustes → Preguntas frecuentes, se cargan, editan y quitan las preguntas — vienen 4 de ejemplo (medios de pago, envíos, retiro y personalizados) para que se vea el formato; el botón del portal se oculta solo si no hay ninguna cargada.
 
 ## Configuración
 

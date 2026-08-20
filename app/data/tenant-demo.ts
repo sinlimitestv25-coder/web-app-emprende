@@ -90,6 +90,11 @@ export type Category = {
   subcategories: Subcategory[];
 };
 
+export type FaqItem = {
+  question: string;
+  answer: string;
+};
+
 export type BannerLinkType = "none" | "category" | "subcategory" | "keyword";
 
 export type Banner = {
@@ -175,6 +180,7 @@ export type TenantDemoState = {
   portal: PortalSettings;
   categories: Category[];
   stockRequests: StockRequest[];
+  faqs: FaqItem[];
 };
 
 export const tenantStorageKey = "nexo-v0.3-luna-creativa";
@@ -318,5 +324,10 @@ export const defaultTenantDemo: TenantDemoState = {
   stockRequests: [
     { id: "req_01", productId: "prd_05", productName: "Taza mágica personalizada", variantId: "", variantName: "", customerName: "Julieta Fernández", customerPhone: "+54 9 11 4400-2210", createdAt: "Hoy, 11:05" },
     { id: "req_02", productId: "prd_07", productName: "Llavero Dragon Ball", variantId: "var_roshi", variantName: "Maestro Roshi", customerName: "Braian Sosa", customerPhone: "+54 9 11 5522-9081", createdAt: "Ayer, 20:14" },
+  ],  faqs: [
+    { question: "¿Cuáles son los medios de pago?", answer: "Aceptamos todos los medios de pago, a convenir y confirmar por WhatsApp con la vendedora." },
+    { question: "¿Hacen envíos?", answer: "Sí, hacemos envíos a todo el país. Coordinamos el costo y el tiempo de entrega por WhatsApp según tu ubicación." },
+    { question: "¿Puedo retirar en persona?", answer: "Sí, coordinamos el día y el lugar de retiro por WhatsApp." },
+    { question: "¿Hacen productos personalizados?", answer: "Sí, escribínos por WhatsApp contándonos qué tenés en mente y te asesoramos." },
   ],
 };

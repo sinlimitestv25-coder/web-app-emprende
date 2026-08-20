@@ -50,6 +50,7 @@ function readLatestState(fallback: TenantDemoState): TenantDemoState {
       products: migrateProducts(parsed.products),
       orders: migrateOrders(parsed.orders),
       stockRequests: Array.isArray(parsed.stockRequests) ? parsed.stockRequests : [],
+      faqs: Array.isArray(parsed.faqs) ? parsed.faqs : fallback.faqs,
     };
   } catch {
     return fallback;
@@ -72,6 +73,8 @@ export function PublicStore({ slug }: { slug: string }) {
   const [requestPhone, setRequestPhone] = useState("");
   const [legalOpen, setLegalOpen] = useState<LegalDoc | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [faqOpen, setFaqOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(tenantStorageKey);
@@ -85,13 +88,14 @@ export function PublicStore({ slug }: { slug: string }) {
         orders: migrateOrders(parsed.orders),
         products: migrateProducts(parsed.products),
         stockRequests: Array.isArray(parsed.stockRequests) ? parsed.stockRequests : [],
+        faqs: Array.isArray(parsed.faqs) ? parsed.faqs : defaultTenantDemo.faqs,
       });
     } catch {
       /* datos de prueba corruptos: se ignoran */
     }
   }, []);
 
-  const { portal, products } = state;
+  const { portal, products, faqs } = state;
   const banners = portal.banners;
   const published = useMemo(() => products.filter((product) => {
     if (!product.published) return false;
@@ -291,6 +295,7 @@ export function PublicStore({ slug }: { slug: string }) {
 
       <div className="public-store-quicklinks">
         <button type="button" onClick={() => setAboutOpen(true)}><AppIcon name="customers" /> Quiénes somos</button>
+        {faqs.length > 0 && <button type="button" onClick={() => setFaqOpen(true)}><AppIcon name="question" /> Preguntas frecuentes</button>}
       </div>
 
       <section className="public-store-hero">
@@ -395,6 +400,27 @@ export function PublicStore({ slug }: { slug: string }) {
             {portal.about && <p className="public-store-about-text">{portal.about}</p>}
             {portal.aboutLocation && <p className="public-store-about-location"><AppIcon name="globe" /> {portal.aboutLocation}</p>}
             <a className="public-store-checkout" href={`https://wa.me/${portal.whatsapp}`} target="_blank" rel="noreferrer">Escribinos por WhatsApp</a>
+          </div>
+        </div>
+      )}
+
+      {faqOpen && (
+        <div className="public-store-modal-backdrop" onMouseDown={() => setFaqOpen(false)}>
+          <div className="public-store-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="public-store-modal-close" type="button" onClick={() => setFaqOpen(false)} aria-label="Cerrar">×</button>
+            <span className="public-store-eyebrow">Preguntas frecuentes</span>
+            <h2>¿En qué te podemos ayudar?</h2>
+            <div className="public-store-faq-list">
+              {faqs.map((faq, index) => (
+                <div className={openFaqIndex === index ? "public-store-faq-item open" : "public-store-faq-item"} key={index}>
+                  <button type="button" onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}>
+                    {faq.question}<span>{openFaqIndex === index ? "−" : "+"}</span>
+                  </button>
+                  {openFaqIndex === index && <p>{faq.answer}</p>}
+                </div>
+              ))}
+            </div>
+            <a className="public-store-checkout" href={`https://wa.me/${portal.whatsapp}`} target="_blank" rel="noreferrer">¿No encontraste tu respuesta? Escribinos</a>
           </div>
         </div>
       )}

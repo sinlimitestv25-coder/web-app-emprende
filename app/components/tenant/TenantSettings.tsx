@@ -10,6 +10,8 @@ import { AppIcon } from "../ui/AppIcon";
 export function TenantSettings({ state, setState, flash, resetDemo }: { state: TenantDemoState; setState: Dispatch<SetStateAction<TenantDemoState>>; flash: (message: string) => void; resetDemo: () => void }) {
   const [newCategory, setNewCategory] = useState("");
   const [subcategoryDrafts, setSubcategoryDrafts] = useState<Record<string, { name: string; keywords: string }>>({});
+  const [newFaqQuestion, setNewFaqQuestion] = useState("");
+  const [newFaqAnswer, setNewFaqAnswer] = useState("");
 
   async function handleLogo(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -72,6 +74,21 @@ export function TenantSettings({ state, setState, flash, resetDemo }: { state: T
     }));
   }
 
+  function addFaq(event: FormEvent) {
+    event.preventDefault();
+    const question = newFaqQuestion.trim();
+    const answer = newFaqAnswer.trim();
+    if (!question || !answer) return;
+    setState((current) => ({ ...current, faqs: [...current.faqs, { question, answer }] }));
+    setNewFaqQuestion("");
+    setNewFaqAnswer("");
+    flash("Pregunta agregada.");
+  }
+
+  function removeFaq(index: number) {
+    setState((current) => ({ ...current, faqs: current.faqs.filter((_, itemIndex) => itemIndex !== index) }));
+  }
+
   return <>
     <div className="page-heading"><div><p className="eyebrow">Mi negocio</p><h1>Ajustes</h1><p>Identidad de la marca, categorías y preferencias de la demostración.</p></div></div>
 
@@ -120,6 +137,27 @@ export function TenantSettings({ state, setState, flash, resetDemo }: { state: T
         <form className="category-add-form" onSubmit={addCategory}>
           <input value={newCategory} onChange={(event) => setNewCategory(event.target.value)} placeholder="Nueva categoría" />
           <button className="button secondary" type="submit">+ Agregar categoría</button>
+        </form>
+      </div>
+    </section>
+
+    <section className="panel">
+      <div className="panel-title"><div><h2>Preguntas frecuentes</h2><p>Se ven en tu tienda pública, en el botón "Preguntas frecuentes" arriba del banner.</p></div></div>
+      <div className="faq-manager">
+        {state.faqs.map((faq, index) => (
+          <div className="faq-item" key={index}>
+            <div>
+              <strong>{faq.question}</strong>
+              <p>{faq.answer}</p>
+            </div>
+            <button type="button" className="link-button" onClick={() => removeFaq(index)}>Quitar</button>
+          </div>
+        ))}
+        {state.faqs.length === 0 && <p className="portal-banner-empty">Todavía no cargaste preguntas frecuentes.</p>}
+        <form className="faq-add-form" onSubmit={addFaq}>
+          <input value={newFaqQuestion} onChange={(event) => setNewFaqQuestion(event.target.value)} placeholder="Pregunta, ej. ¿Hacen envíos?" />
+          <textarea value={newFaqAnswer} onChange={(event) => setNewFaqAnswer(event.target.value)} placeholder="Respuesta" />
+          <button className="button secondary" type="submit">+ Agregar pregunta</button>
         </form>
       </div>
     </section>

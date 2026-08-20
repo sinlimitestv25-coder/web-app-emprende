@@ -268,11 +268,17 @@ button { color: inherit; }
 .public-store-logo span { display:block; margin-top:2px; color:#68726e; font-family:var(--font-geist-sans),Arial,sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; }
 .public-store-cart-button { border:1px solid #ddd9d3; border-radius:999px; padding:10px 16px; background:white; color:#2c312e; font:600 13px var(--font-geist-sans),Arial,sans-serif; cursor:pointer; }
 .public-store-cart-button b { margin-left:8px; padding:3px 8px; border-radius:999px; color:white; background:var(--store-accent); }
-.public-store-quicklinks { padding:16px 6%; display:flex; flex-wrap:wrap; gap:12px; justify-content:center; background:#fffdfa; }
+.public-store-quicklinks { padding:16px 6%; display:flex; flex-wrap:wrap; gap:12px; justify-content:flex-end; background:#fffdfa; }
 .public-store-quicklinks button { display:flex; align-items:center; gap:9px; border:1px solid #ddd9d3; border-radius:999px; padding:13px 22px; background:white; color:#2c312e; font:600 14px var(--font-geist-sans),Arial,sans-serif; cursor:pointer; transition:border-color .15s ease,color .15s ease; }
 .public-store-quicklinks button:hover { border-color:var(--store-accent); color:var(--store-accent); }
 .public-store-quicklinks .app-icon { color:var(--store-accent); font-size:18px; }
-@media (max-width:560px) { .public-store-quicklinks { padding:14px 20px; } .public-store-quicklinks button { flex:1 1 auto; justify-content:center; padding:12px 16px; } }
+@media (max-width:560px) { .public-store-quicklinks { padding:14px 20px; justify-content:center; } .public-store-quicklinks button { flex:1 1 auto; justify-content:center; padding:12px 16px; } }
+.public-store-faq-list { display:flex; flex-direction:column; gap:10px; margin:16px 0 20px; }
+.public-store-faq-item { border:1px solid #eee9e1; border-radius:12px; overflow:hidden; }
+.public-store-faq-item button { display:flex; align-items:center; justify-content:space-between; width:100%; padding:14px 16px; border:0; background:#fffdfa; color:#2c312e; font:600 13px var(--font-geist-sans),Arial,sans-serif; text-align:left; cursor:pointer; }
+.public-store-faq-item.open button { background:#f6f2ea; }
+.public-store-faq-item button span { color:var(--store-accent); font-size:16px; font-weight:700; }
+.public-store-faq-item p { margin:0; padding:0 16px 16px; color:#5b6360; font-size:13px; line-height:1.6; }
 .public-store-eyebrow { display:block; color:var(--store-accent); font:700 11px var(--font-geist-sans),Arial,sans-serif; letter-spacing:2px; text-transform:uppercase; }
 .public-store-hero { padding:64px 6%; display:flex; justify-content:center; background:#f3e9df; }
 .public-store-hero-content { max-width:640px; text-align:center; }
@@ -444,6 +450,14 @@ button { color: inherit; }
 .subcategory-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
 .subcategory-add-form { display:flex; flex-wrap:wrap; gap:8px; }
 .subcategory-add-form input { flex:1; min-width:140px; padding:9px 11px; border:1px solid var(--line); border-radius:9px; outline:0; background:white; font-size:11px; }
+
+.faq-manager { padding:0 22px 22px; }
+.faq-item { margin-bottom:12px; padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:var(--paper); display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.faq-item strong { display:block; font-size:12px; }
+.faq-item p { margin:5px 0 0; color:var(--muted); font-size:11px; line-height:1.5; }
+.faq-add-form { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; }
+.faq-add-form input,.faq-add-form textarea { flex:1; min-width:180px; padding:10px 12px; border:1px solid var(--line); border-radius:9px; outline:0; background:#fbfcfa; font-size:12px; font-family:inherit; }
+.faq-add-form textarea { min-height:42px; resize:vertical; }
 
 .field-hint { display:block; margin-top:5px; color:var(--muted); font-size:9px; font-weight:500; }
 

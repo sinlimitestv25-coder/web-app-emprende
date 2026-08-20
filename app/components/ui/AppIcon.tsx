@@ -29,6 +29,7 @@ const shapes: Record<string, ReactNode> = {
   ready: <><rect x="4" y="4" width="16" height="16" rx="3" /><path d="m8 12.3 2.6 2.6L16.5 9" /></>,
   cancel: <><circle cx="12" cy="12" r="8.5" /><path d="m9 9 6 6M15 9l-6 6" /></>,
   logout: <><path d="M9 4H5v14h4" /><path d="M20 12H9" /><path d="m15 7 5 5-5 5" /></>,
+  question: <><path d="M8.5 8.7 9 7 11 5.7 13.5 6 15 7.5 15 9.3 13 10.8 12 12.2 12 14" /><circle cx="12" cy="17.3" r="1.1" fill="currentColor" stroke="none" /></>,
 };
 
 export function AppIcon({ name, className = "", label }: { name: string; className?: string; label?: string }) {
