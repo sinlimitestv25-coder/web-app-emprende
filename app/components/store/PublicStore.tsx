@@ -509,11 +509,12 @@ export function PublicStore({ slug }: { slug: string }) {
                 <span className="public-store-option-label">Medio de pago</span>
                 <div className="public-store-option-row">
                   <button type="button" className={paymentMethod === "transferencia" ? "active" : ""} onClick={() => setPaymentMethod("transferencia")}>Transferencia</button>
+                  <button type="button" className={paymentMethod === "efectivo" ? "active" : ""} onClick={() => setPaymentMethod("efectivo")}>Efectivo</button>
                   <button type="button" disabled title="Próximamente">Mercado Pago<small>Próximamente</small></button>
-                  <button type="button" disabled title="Próximamente">Efectivo<small>Próximamente</small></button>
                   <button type="button" disabled title="Próximamente">Tarjeta<small>Próximamente</small></button>
                 </div>
                 {paymentMethod === "transferencia" && <p className="public-store-payment-note">Elegiste transferencia bancaria — te pasamos el alias por WhatsApp para coordinar el pago.</p>}
+                {paymentMethod === "efectivo" && <p className="public-store-payment-note">Elegiste efectivo — coordinamos el pago a través de WhatsApp con la vendedora.</p>}
 
                 {shippingCost > 0 && <div className="public-store-cart-total"><span>Envío</span><strong>{money.format(shippingCost)}</strong></div>}
                 <div className="public-store-cart-total public-store-cart-total-grand"><span>Total a pagar</span><strong>{money.format(orderTotal)}</strong></div>

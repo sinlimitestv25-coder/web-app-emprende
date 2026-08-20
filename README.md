@@ -1,4 +1,4 @@
-# Nexo v1.2.2
+# Nexo v1.2.3
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -230,6 +230,11 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 
 - el botón "Carrito" de arriba del portal ahora tiene el ícono de un carrito de compras dibujado, además del contador;
 - el botón "Agregar +" de cada producto también tiene el ícono del carrito, para que se vea junto al de Consultar por WhatsApp.
+
+### Pago en efectivo habilitado 1.2.3
+
+- "Efectivo" ya se puede elegir como medio de pago en el carrito del portal (antes decía "Próximamente"); al elegirlo avisa que se coordina el pago por WhatsApp con la vendedora, igual que transferencia;
+- Mercado Pago y Tarjeta siguen como "Próximamente", porque esos sí necesitan conectar un servicio de pagos real.
 
 ## Configuración
 
