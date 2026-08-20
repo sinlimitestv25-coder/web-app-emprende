@@ -30,6 +30,8 @@ const shapes: Record<string, ReactNode> = {
   cancel: <><circle cx="12" cy="12" r="8.5" /><path d="m9 9 6 6M15 9l-6 6" /></>,
   logout: <><path d="M9 4H5v14h4" /><path d="M20 12H9" /><path d="m15 7 5 5-5 5" /></>,
   question: <><path d="M8.5 8.7 9 7 11 5.7 13.5 6 15 7.5 15 9.3 13 10.8 12 12.2 12 14" /><circle cx="12" cy="17.3" r="1.1" fill="currentColor" stroke="none" /></>,
+  gridSmall: <><rect x="3" y="3.5" width="5" height="5" rx="1" /><rect x="9.5" y="3.5" width="5" height="5" rx="1" /><rect x="16" y="3.5" width="5" height="5" rx="1" /><rect x="3" y="10" width="5" height="5" rx="1" /><rect x="9.5" y="10" width="5" height="5" rx="1" /><rect x="16" y="10" width="5" height="5" rx="1" /><rect x="3" y="16.5" width="5" height="5" rx="1" /><rect x="9.5" y="16.5" width="5" height="5" rx="1" /><rect x="16" y="16.5" width="5" height="5" rx="1" /></>,
+  list: <><path d="M4 6.5h4M11 6.5h9" /><path d="M4 12h4M11 12h9" /><path d="M4 17.5h4M11 17.5h9" /></>,
 };
 
 export function AppIcon({ name, className = "", label }: { name: string; className?: string; label?: string }) {

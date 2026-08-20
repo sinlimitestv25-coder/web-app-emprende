@@ -95,6 +95,12 @@ export type FaqItem = {
   answer: string;
 };
 
+export type ShippingZone = {
+  name: string;
+  prefixes: string[];
+  cost: number;
+};
+
 export type BannerLinkType = "none" | "category" | "subcategory" | "keyword";
 
 export type Banner = {
@@ -144,6 +150,10 @@ export type StockRequest = {
 
 export type OrderChannel = "portal" | "directa";
 
+export type PaymentMethod = "" | "transferencia" | "mercadopago" | "efectivo" | "tarjeta";
+
+export type DeliveryMethod = "" | "envio" | "retiro";
+
 export type Order = {
   id: string;
   customerId: string;
@@ -155,6 +165,10 @@ export type Order = {
   stockCommitted: boolean;
   channel: OrderChannel;
   location: string;
+  paymentMethod: PaymentMethod;
+  deliveryMethod: DeliveryMethod;
+  postalCode: string;
+  shippingCost: number;
 };
 
 export type PortalSettings = {
@@ -181,6 +195,7 @@ export type TenantDemoState = {
   categories: Category[];
   stockRequests: StockRequest[];
   faqs: FaqItem[];
+  shippingZones: ShippingZone[];
 };
 
 export const tenantStorageKey = "nexo-v0.3-luna-creativa";
@@ -219,6 +234,10 @@ export function migrateOrders(orders: unknown): Order[] {
       stockCommitted: order.stockCommitted ?? false,
       channel: order.channel ?? "directa",
       location: order.location ?? "",
+      paymentMethod: order.paymentMethod ?? "",
+      deliveryMethod: order.deliveryMethod ?? "",
+      postalCode: order.postalCode ?? "",
+      shippingCost: order.shippingCost ?? 0,
     };
   });
 }
@@ -294,10 +313,10 @@ export const defaultTenantDemo: TenantDemoState = {
     { id: "pro_03", name: "Importadora Central", contact: "Andrea Ruiz", phone: "+54 9 11 5501-7730", supplies: "Vasos térmicos y botellas" },
   ],
   orders: [
-    { id: "PED-1048", customerId: "cli_01", customerName: "Camila Torres", items: [{ productId: "prd_01", productName: "Taza Dragon Ball", variantId: "", variantName: "", quantity: 2, unitPrice: 12500 }, { productId: "prd_03", productName: "Llavero Stitch", variantId: "", variantName: "", quantity: 1, unitPrice: 4800 }], total: 29800, status: "Nuevo", createdAt: "Hoy, 10:24", stockCommitted: false, channel: "portal", location: "" },
-    { id: "PED-1047", customerId: "cli_02", customerName: "Rocío Benítez", items: [{ productId: "prd_04", productName: "Vinilo nombre personalizado", variantId: "", variantName: "", quantity: 3, unitPrice: 7200 }], total: 21600, status: "Preparando", createdAt: "Hoy, 09:12", stockCommitted: true, channel: "directa", location: "Feria de Avellaneda" },
-    { id: "PED-1046", customerId: "cli_04", customerName: "Diego Acosta", items: [{ productId: "prd_06", productName: "Botella infantil Disney", variantId: "", variantName: "", quantity: 1, unitPrice: 18900 }], total: 18900, status: "Listo", createdAt: "Ayer, 18:40", stockCommitted: true, channel: "portal", location: "" },
-    { id: "PED-1045", customerId: "cli_03", customerName: "Valentina López", items: [{ productId: "prd_03", productName: "Llavero Stitch", variantId: "", variantName: "", quantity: 2, unitPrice: 4800 }], total: 9600, status: "Entregado", createdAt: "12 ago, 16:05", stockCommitted: true, channel: "directa", location: "Feria del Ferro" },
+    { id: "PED-1048", customerId: "cli_01", customerName: "Camila Torres", items: [{ productId: "prd_01", productName: "Taza Dragon Ball", variantId: "", variantName: "", quantity: 2, unitPrice: 12500 }, { productId: "prd_03", productName: "Llavero Stitch", variantId: "", variantName: "", quantity: 1, unitPrice: 4800 }], total: 29800, status: "Nuevo", createdAt: "Hoy, 10:24", stockCommitted: false, channel: "portal", location: "", paymentMethod: "", deliveryMethod: "", postalCode: "", shippingCost: 0 },
+    { id: "PED-1047", customerId: "cli_02", customerName: "Rocío Benítez", items: [{ productId: "prd_04", productName: "Vinilo nombre personalizado", variantId: "", variantName: "", quantity: 3, unitPrice: 7200 }], total: 21600, status: "Preparando", createdAt: "Hoy, 09:12", stockCommitted: true, channel: "directa", location: "Feria de Avellaneda", paymentMethod: "", deliveryMethod: "", postalCode: "", shippingCost: 0 },
+    { id: "PED-1046", customerId: "cli_04", customerName: "Diego Acosta", items: [{ productId: "prd_06", productName: "Botella infantil Disney", variantId: "", variantName: "", quantity: 1, unitPrice: 18900 }], total: 18900, status: "Listo", createdAt: "Ayer, 18:40", stockCommitted: true, channel: "portal", location: "", paymentMethod: "", deliveryMethod: "", postalCode: "", shippingCost: 0 },
+    { id: "PED-1045", customerId: "cli_03", customerName: "Valentina López", items: [{ productId: "prd_03", productName: "Llavero Stitch", variantId: "", variantName: "", quantity: 2, unitPrice: 4800 }], total: 9600, status: "Entregado", createdAt: "12 ago, 16:05", stockCommitted: true, channel: "directa", location: "Feria del Ferro", paymentMethod: "", deliveryMethod: "", postalCode: "", shippingCost: 0 },
   ],
   portal: {
     slug: "pensando-en-ti",
@@ -329,5 +348,8 @@ export const defaultTenantDemo: TenantDemoState = {
     { question: "¿Hacen envíos?", answer: "Sí, hacemos envíos a todo el país. Coordinamos el costo y el tiempo de entrega por WhatsApp según tu ubicación." },
     { question: "¿Puedo retirar en persona?", answer: "Sí, coordinamos el día y el lugar de retiro por WhatsApp." },
     { question: "¿Hacen productos personalizados?", answer: "Sí, escribínos por WhatsApp contándonos qué tenés en mente y te asesoramos." },
+  ],
+  shippingZones: [
+    { name: "CABA y GBA (ejemplo, ajustar)", prefixes: ["1"], cost: 4000 },
   ],
 };

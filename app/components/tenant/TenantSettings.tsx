@@ -7,11 +7,16 @@ import type { TenantDemoState } from "../../data/tenant-demo";
 import { prepareImage } from "../../lib/image";
 import { AppIcon } from "../ui/AppIcon";
 
+const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", currencyDisplay: "symbol", maximumFractionDigits: 0 });
+
 export function TenantSettings({ state, setState, flash, resetDemo }: { state: TenantDemoState; setState: Dispatch<SetStateAction<TenantDemoState>>; flash: (message: string) => void; resetDemo: () => void }) {
   const [newCategory, setNewCategory] = useState("");
   const [subcategoryDrafts, setSubcategoryDrafts] = useState<Record<string, { name: string; keywords: string }>>({});
   const [newFaqQuestion, setNewFaqQuestion] = useState("");
   const [newFaqAnswer, setNewFaqAnswer] = useState("");
+  const [newZoneName, setNewZoneName] = useState("");
+  const [newZonePrefixes, setNewZonePrefixes] = useState("");
+  const [newZoneCost, setNewZoneCost] = useState("");
 
   async function handleLogo(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -109,6 +114,23 @@ export function TenantSettings({ state, setState, flash, resetDemo }: { state: T
     setState((current) => ({ ...current, faqs: current.faqs.filter((_, itemIndex) => itemIndex !== index) }));
   }
 
+  function addZone(event: FormEvent) {
+    event.preventDefault();
+    const name = newZoneName.trim();
+    const prefixes = newZonePrefixes.split(",").map((prefix) => prefix.trim()).filter(Boolean);
+    const cost = Math.max(0, Number(newZoneCost));
+    if (!name || prefixes.length === 0) { flash("Cargá un nombre y al menos un prefijo de código postal."); return; }
+    setState((current) => ({ ...current, shippingZones: [...current.shippingZones, { name, prefixes, cost }] }));
+    setNewZoneName("");
+    setNewZonePrefixes("");
+    setNewZoneCost("");
+    flash("Zona de envío agregada.");
+  }
+
+  function removeZone(index: number) {
+    setState((current) => ({ ...current, shippingZones: current.shippingZones.filter((_, itemIndex) => itemIndex !== index) }));
+  }
+
   return <>
     <div className="page-heading"><div><p className="eyebrow">Mi negocio</p><h1>Ajustes</h1><p>Identidad de la marca, categorías y preferencias de la demostración.</p></div></div>
 
@@ -199,6 +221,29 @@ export function TenantSettings({ state, setState, flash, resetDemo }: { state: T
           <textarea value={newFaqAnswer} onChange={(event) => setNewFaqAnswer(event.target.value)} placeholder="Respuesta" />
           <button className="button secondary" type="submit">+ Agregar pregunta</button>
         </form>
+      </div>
+    </section>
+
+    <section className="panel">
+      <div className="panel-title"><div><h2>Zonas de envío</h2><p>Cuando alguien pide envío en el portal, se busca a qué zona pertenece su código postal y se suma ese costo al pedido. Si el código no coincide con ninguna zona, se le pide que coordine el envío por WhatsApp.</p></div></div>
+      <div className="faq-manager">
+        {state.shippingZones.map((zone, index) => (
+          <div className="faq-item" key={index}>
+            <div>
+              <strong>{zone.name} · {money.format(zone.cost)}</strong>
+              <p>Códigos postales que empiezan con: {zone.prefixes.join(", ")}</p>
+            </div>
+            <button type="button" className="link-button" onClick={() => removeZone(index)}>Quitar</button>
+          </div>
+        ))}
+        {state.shippingZones.length === 0 && <p className="portal-banner-empty">Todavía no cargaste zonas de envío.</p>}
+        <form className="faq-add-form" onSubmit={addZone}>
+          <input value={newZoneName} onChange={(event) => setNewZoneName(event.target.value)} placeholder="Nombre de la zona, ej. CABA" />
+          <input value={newZonePrefixes} onChange={(event) => setNewZonePrefixes(event.target.value)} placeholder="Prefijos separados por coma, ej. 1000, 1400" />
+          <input type="number" min="0" value={newZoneCost} onChange={(event) => setNewZoneCost(event.target.value)} placeholder="Costo" />
+          <button className="button secondary" type="submit">+ Agregar zona</button>
+        </form>
+        <p className="field-hint">La zona de ejemplo que viene cargada es solo para mostrar el formato — reemplazala por tus propios códigos postales y costos reales.</p>
       </div>
     </section>
 

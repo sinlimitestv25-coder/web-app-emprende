@@ -36,7 +36,7 @@ export function TenantOrders({ state, setState, changeStatus, flash }: { state: 
     const availableStock = variant ? variant.stock : productStock(product);
     if (quantity > availableStock) { flash("La cantidad solicitada supera el stock disponible."); return; }
     const unitPrice = variant ? variant.price : product.price;
-    const order: Order = { id: `PED-${1049 + state.orders.length}`, customerId: customer?.id ?? "", customerName: customer?.name ?? "Vendedora", items: [{ productId: product.id, productName: product.name, variantId: variant?.id ?? "", variantName: variant?.name ?? "", quantity, unitPrice }], total: unitPrice * quantity, status: "Nuevo", createdAt: "Ahora", stockCommitted: false, channel: "directa", location: form.location.trim() };
+    const order: Order = { id: `PED-${1049 + state.orders.length}`, customerId: customer?.id ?? "", customerName: customer?.name ?? "Vendedora", items: [{ productId: product.id, productName: product.name, variantId: variant?.id ?? "", variantName: variant?.name ?? "", quantity, unitPrice }], total: unitPrice * quantity, status: "Nuevo", createdAt: "Ahora", stockCommitted: false, channel: "directa", location: form.location.trim(), paymentMethod: "", deliveryMethod: "", postalCode: "", shippingCost: 0 };
     setState((current) => ({ ...current, orders: [order, ...current.orders] }));
     setOpen(false);
     flash("Pedido creado. El stock se descontará al comenzar a prepararlo.");

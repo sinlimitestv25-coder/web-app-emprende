@@ -51,6 +51,7 @@ function readLatestState(fallback: TenantDemoState): TenantDemoState {
       orders: migrateOrders(parsed.orders),
       stockRequests: Array.isArray(parsed.stockRequests) ? parsed.stockRequests : [],
       faqs: Array.isArray(parsed.faqs) ? parsed.faqs : fallback.faqs,
+      shippingZones: Array.isArray(parsed.shippingZones) ? parsed.shippingZones : fallback.shippingZones,
     };
   } catch {
     return fallback;
@@ -75,6 +76,10 @@ export function PublicStore({ slug }: { slug: string }) {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<"grid-lg" | "grid-sm" | "list">("grid-lg");
+  const [deliveryMethod, setDeliveryMethod] = useState<"" | "envio" | "retiro">("");
+  const [postalCode, setPostalCode] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"" | "transferencia" | "mercadopago" | "efectivo" | "tarjeta">("");
 
   useEffect(() => {
     const saved = window.localStorage.getItem(tenantStorageKey);
@@ -89,6 +94,7 @@ export function PublicStore({ slug }: { slug: string }) {
         products: migrateProducts(parsed.products),
         stockRequests: Array.isArray(parsed.stockRequests) ? parsed.stockRequests : [],
         faqs: Array.isArray(parsed.faqs) ? parsed.faqs : defaultTenantDemo.faqs,
+        shippingZones: Array.isArray(parsed.shippingZones) ? parsed.shippingZones : defaultTenantDemo.shippingZones,
       });
     } catch {
       /* datos de prueba corruptos: se ignoran */
@@ -139,6 +145,11 @@ export function PublicStore({ slug }: { slug: string }) {
   }, [cart, published]);
   const cartTotal = cartLines.reduce((total, line) => total + line.price * line.quantity, 0);
   const cartCount = Object.values(cart).reduce((total, quantity) => total + quantity, 0);
+  const matchedZone = deliveryMethod === "envio" && postalCode.trim()
+    ? state.shippingZones.find((zone) => zone.prefixes.some((prefix) => postalCode.trim().startsWith(prefix))) ?? null
+    : null;
+  const shippingCost = matchedZone ? matchedZone.cost : 0;
+  const orderTotal = cartTotal + shippingCost;
 
   useEffect(() => {
     setSlide(0);
@@ -184,14 +195,32 @@ export function PublicStore({ slug }: { slug: string }) {
     return `https://wa.me/${portal.whatsapp}?text=${text}`;
   }
 
-  const message = encodeURIComponent(`Hola ${portal.storeName}, quiero hacer este pedido:\n${cartLines.map((line) => `• ${line.productName}${line.variantName ? ` (${line.variantName})` : ""} × ${line.quantity} — ${money.format(line.price * line.quantity)}`).join("\n")}\nTotal: ${money.format(cartTotal)}`);
-  const whatsappUrl = `https://wa.me/${portal.whatsapp}?text=${message}`;
-
   function checkout() {
     if (!buyerName.trim() || !buyerPhone.trim()) {
       flash("Ingresá tu nombre y tu WhatsApp para enviar el pedido.");
       return;
     }
+    if (!deliveryMethod) {
+      flash("Elegí si querés retiro o envío.");
+      return;
+    }
+    if (deliveryMethod === "envio" && !postalCode.trim()) {
+      flash("Ingresá tu código postal para calcular el envío.");
+      return;
+    }
+    if (!paymentMethod) {
+      flash("Elegí un medio de pago.");
+      return;
+    }
+
+    const paymentLabels: Record<string, string> = { transferencia: "Transferencia bancaria", mercadopago: "Mercado Pago", efectivo: "Efectivo", tarjeta: "Tarjeta" };
+    const deliveryLine = deliveryMethod === "retiro"
+      ? "Retiro en el local"
+      : matchedZone
+        ? `Envío a CP ${postalCode.trim()} (${matchedZone.name}) — ${money.format(matchedZone.cost)}`
+        : `Envío a CP ${postalCode.trim()} — a confirmar costo`;
+    const message = encodeURIComponent(`Hola ${portal.storeName}, quiero hacer este pedido:\n${cartLines.map((line) => `• ${line.productName}${line.variantName ? ` (${line.variantName})` : ""} × ${line.quantity} — ${money.format(line.price * line.quantity)}`).join("\n")}\n${deliveryLine}\nMedio de pago: ${paymentLabels[paymentMethod]}\nTotal: ${money.format(orderTotal)}`);
+    const whatsappUrl = `https://wa.me/${portal.whatsapp}?text=${message}`;
 
     const latest = readLatestState(state);
     const phoneDigits = buyerPhone.replace(/\D/g, "");
@@ -204,12 +233,16 @@ export function PublicStore({ slug }: { slug: string }) {
       customerId: customer.id,
       customerName: customer.name,
       items: cartLines.map((line) => ({ productId: line.productId, productName: line.productName, variantId: line.variantId, variantName: line.variantName, quantity: line.quantity, unitPrice: line.price })),
-      total: cartTotal,
+      total: orderTotal,
       status: "Nuevo",
       createdAt: "Portal · ahora",
       stockCommitted: false,
       channel: "portal",
       location: "",
+      paymentMethod,
+      deliveryMethod,
+      postalCode: deliveryMethod === "envio" ? postalCode.trim() : "",
+      shippingCost,
     };
 
     const updated: TenantDemoState = { ...latest, customers, orders: [newOrder, ...latest.orders] };
@@ -222,6 +255,9 @@ export function PublicStore({ slug }: { slug: string }) {
     window.open(whatsappUrl, "_blank", "noreferrer");
     setCart({});
     setBuyerName("");
+    setDeliveryMethod("");
+    setPostalCode("");
+    setPaymentMethod("");
     setBuyerPhone("");
     setCartOpen(false);
   }
@@ -338,9 +374,16 @@ export function PublicStore({ slug }: { slug: string }) {
               <button key={category.name} type="button" className={categoryFilter === category.name ? "active" : ""} onClick={() => setCategoryFilter(category.name)}>{category.name}</button>
             ))}
           </div>
-          <input className="public-store-search" value={searchText} onChange={(event) => setSearchText(event.target.value)} placeholder="Buscar por material, tema, nombre…" />
+          <div className="public-store-filters-right">
+            <input className="public-store-search" value={searchText} onChange={(event) => setSearchText(event.target.value)} placeholder="Buscar por material, tema, nombre…" />
+            <div className="public-store-view-toggle" role="group" aria-label="Cómo ver los productos">
+              <button type="button" className={viewMode === "list" ? "active" : ""} aria-label="Ver como lista" title="Lista" onClick={() => setViewMode("list")}><AppIcon name="list" /></button>
+              <button type="button" className={viewMode === "grid-lg" ? "active" : ""} aria-label="Ver como mosaico grande" title="Mosaico grande" onClick={() => setViewMode("grid-lg")}><AppIcon name="spaces" /></button>
+              <button type="button" className={viewMode === "grid-sm" ? "active" : ""} aria-label="Ver como mosaico chico" title="Mosaico chico" onClick={() => setViewMode("grid-sm")}><AppIcon name="gridSmall" /></button>
+            </div>
+          </div>
         </div>
-        <div className="public-store-grid">
+        <div className={`public-store-grid mode-${viewMode}`}>
           {filtered.map((product, index) => {
             const variant = variantFor(product);
             const stock = variant ? variant.stock : productStock(product);
@@ -427,7 +470,7 @@ export function PublicStore({ slug }: { slug: string }) {
 
       {cartOpen && (
         <div className="public-store-modal-backdrop" onMouseDown={() => setCartOpen(false)}>
-          <div className="public-store-modal" onMouseDown={(event) => event.stopPropagation()}>
+          <div className="public-store-modal public-store-modal-lg" onMouseDown={(event) => event.stopPropagation()}>
             <button className="public-store-modal-close" type="button" onClick={() => setCartOpen(false)} aria-label="Cerrar carrito">×</button>
             <span className="public-store-eyebrow">Pedido del portal</span>
             <h2>Tu carrito</h2>
@@ -441,12 +484,38 @@ export function PublicStore({ slug }: { slug: string }) {
               ))}
               {cartLines.length === 0 && <div className="public-store-cart-empty">Todavía no agregaste productos.</div>}
             </div>
-            <div className="public-store-cart-total"><span>Total del pedido</span><strong>{money.format(cartTotal)}</strong></div>
+            <div className="public-store-cart-total"><span>Subtotal productos</span><strong>{money.format(cartTotal)}</strong></div>
             {cartLines.length > 0 && (
               <div className="public-store-buyer-form">
                 <label>Tu nombre<input value={buyerName} onChange={(event) => setBuyerName(event.target.value)} placeholder="Nombre y apellido" /></label>
                 <label>Tu WhatsApp<input value={buyerPhone} onChange={(event) => setBuyerPhone(event.target.value)} placeholder="+54 9…" /></label>
-                <p className="public-store-payment-note">Aceptamos todos los medios de pago — a convenir y confirmar con la vendedora.</p>
+
+                <span className="public-store-option-label">Retiro o envío</span>
+                <div className="public-store-option-row">
+                  <button type="button" className={deliveryMethod === "retiro" ? "active" : ""} onClick={() => setDeliveryMethod("retiro")}>Retiro en el local</button>
+                  <button type="button" className={deliveryMethod === "envio" ? "active" : ""} onClick={() => setDeliveryMethod("envio")}>Envío a domicilio</button>
+                </div>
+                {deliveryMethod === "envio" && (
+                  <label>Código postal<input value={postalCode} onChange={(event) => setPostalCode(event.target.value)} placeholder="Ej. 1900" /></label>
+                )}
+                {deliveryMethod === "envio" && postalCode.trim() && (
+                  matchedZone
+                    ? <p className="public-store-shipping-note">Envío a {matchedZone.name}: {money.format(matchedZone.cost)}</p>
+                    : <p className="public-store-shipping-note muted">No tenemos una zona cargada para ese código postal — coordinamos el costo de envío por WhatsApp.</p>
+                )}
+
+                <span className="public-store-option-label">Medio de pago</span>
+                <div className="public-store-option-row">
+                  <button type="button" className={paymentMethod === "transferencia" ? "active" : ""} onClick={() => setPaymentMethod("transferencia")}>Transferencia</button>
+                  <button type="button" disabled title="Próximamente">Mercado Pago<small>Próximamente</small></button>
+                  <button type="button" disabled title="Próximamente">Efectivo<small>Próximamente</small></button>
+                  <button type="button" disabled title="Próximamente">Tarjeta<small>Próximamente</small></button>
+                </div>
+                {paymentMethod === "transferencia" && <p className="public-store-payment-note">Elegiste transferencia bancaria — te pasamos el alias por WhatsApp para coordinar el pago.</p>}
+
+                {shippingCost > 0 && <div className="public-store-cart-total"><span>Envío</span><strong>{money.format(shippingCost)}</strong></div>}
+                <div className="public-store-cart-total public-store-cart-total-grand"><span>Total a pagar</span><strong>{money.format(orderTotal)}</strong></div>
+
                 <button type="button" className="public-store-checkout" onClick={checkout}>
                   Enviar pedido por WhatsApp
                 </button>

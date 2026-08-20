@@ -29,6 +29,7 @@ export function TenantApp({ onExit }: { onExit: () => void }) {
         products: migrateProducts(parsed.products),
         stockRequests: Array.isArray(parsed.stockRequests) ? parsed.stockRequests : [],
         faqs: Array.isArray(parsed.faqs) ? parsed.faqs : defaultTenantDemo.faqs,
+        shippingZones: Array.isArray(parsed.shippingZones) ? parsed.shippingZones : defaultTenantDemo.shippingZones,
       };
     } catch {
       window.localStorage.removeItem(tenantStorageKey);

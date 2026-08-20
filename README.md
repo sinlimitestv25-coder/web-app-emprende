@@ -1,4 +1,4 @@
-# Nexo v1.1.1
+# Nexo v1.2.0
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -212,6 +212,14 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 
 - "Acerca de nosotros" (texto, foto y ubicación) se movió de Portal de ventas a Ajustes, justo arriba de Preguntas frecuentes, para que quede todo junto;
 - en Ajustes, los cambios de "Acerca de nosotros" se guardan al toque (como el logo y las categorías), sin necesidad de tocar "Guardar y publicar".
+
+### Vista de catálogo, envío por código postal y medios de pago 1.2.0
+
+- en el catálogo del portal, tres botones nuevos junto al buscador para ver los productos como lista, mosaico grande (como estaba) o mosaico chico;
+- **envío por código postal**: desde Ajustes → Zonas de envío se cargan zonas (nombre, prefijos de código postal y costo). En el carrito del portal, el comprador elige "Retiro" o "Envío", y si es envío, ingresa su código postal — si coincide con una zona cargada, el costo se suma solo al total; si no coincide, se le avisa que el envío se coordina por WhatsApp. **Importante**: viene una zona de ejemplo nada más, para mostrar el formato — hay que reemplazarla por las zonas y costos reales antes de usarla en serio, esto no calcula tarifas reales de ningún correo;
+- **medio de pago** en el carrito: "Transferencia" ya funciona (al elegirla, avisa que se coordina el alias por WhatsApp); Mercado Pago, efectivo y tarjeta se ven marcados "Próximamente" — activarlos de verdad necesita conectar cada uno por separado más adelante;
+- el pedido que llega por WhatsApp ahora incluye si es envío o retiro, el medio de pago elegido, y el total con envío incluido;
+- la ventana del carrito se agrandó un poco para que entre todo cómodo.
 
 ## Configuración
 
