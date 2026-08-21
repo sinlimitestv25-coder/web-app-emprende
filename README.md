@@ -1,4 +1,4 @@
-# Nexo v1.2.4
+# Nexo v1.2.5
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -240,6 +240,12 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 
 - las tarjetas de producto aparecen con un fundido suave, una detrás de otra, al cargar o filtrar el catálogo;
 - al pasar el mouse sobre una tarjeta, se levanta apenas con una sombra más marcada, y la foto hace un leve zoom — sin exagerar.
+
+### Retoques de la pantalla de login 1.2.5
+
+- el texto "PLATAFORMA MULTITENANT / Administrá el crecimiento" subió un poco de posición, para no tapar parte de la imagen de fondo;
+- "Entrar al emprendimiento" y "Entrar como superadministrador" pasaron de tener el título y la descripción en una misma fila apretada, a mostrarse uno arriba del otro — ahora se lee bien el título;
+- el pie de página del login (Términos de uso, Privacidad, © C&R Soluciones Digitales) volvió a quedar centrado, en vez de separado a los costados.
 
 ## Configuración
 
