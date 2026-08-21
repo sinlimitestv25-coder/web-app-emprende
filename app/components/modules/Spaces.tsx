@@ -42,6 +42,10 @@ export function Spaces({ demoMode }: { demoMode: boolean }) {
     flash("Espacio eliminado.");
   }
 
+  function resetPassword(space: PlatformSpace) {
+    flash(`Se envió un correo para restablecer la contraseña de ${space.owner}.`);
+  }
+
   return (
     <>
       <div className="page-heading"><div><p className="eyebrow">Gestión de la plataforma</p><h1>Espacios</h1><p>Creá y administrá emprendimientos sin entrar en su información comercial.</p></div><button className="button primary" onClick={() => setShowWizard(true)}>+ Nuevo emprendimiento</button></div>
@@ -51,7 +55,7 @@ export function Spaces({ demoMode }: { demoMode: boolean }) {
         <div className="table-tools"><div className="search-field">⌕<input aria-label="Buscar espacios" value={filter} onChange={(event) => setFilter(event.target.value)} placeholder="Buscar por nombre, titular o ID" /></div><button className="select-button">Todos los estados⌄</button></div>
         <div className="spaces-table platform-spaces-table">
           <div className="table-head"><span>Emprendimiento</span><span>Plan</span><span>Estado</span><span>Uso</span><span>Acciones</span></div>
-          {visibleSpaces.map((space) => <div className="table-row" key={space.id}><div className="space-name"><span className={`avatar avatar-${space.tone}`}>{space.initials}</span><div><strong>{space.name}</strong><small>{space.owner} · {space.id}</small></div></div><span className="plan-pill">{space.plan}</span><div className="space-status-cell"><span className={`status ${space.status === "Activo" ? "success" : space.status === "Suspendido" ? "danger" : "neutral"}`}>{space.status}</span><button type="button" className={space.status === "Activo" ? "switch active" : "switch"} disabled={space.status !== "Activo" && space.status !== "Suspendido"} aria-label={space.status === "Activo" ? `Suspender ${space.name}` : `Activar ${space.name}`} onClick={() => toggleStatus(space)}><i /></button></div><div><strong>{space.storage}</strong><small>{space.users}/{space.maxUsers} usuarios · {space.portal}</small></div><button className="row-action" onClick={() => setSelected(space)}>Editar</button></div>)}
+          {visibleSpaces.map((space) => <div className="table-row" key={space.id}><div className="space-name"><span className={`avatar avatar-${space.tone}`}>{space.initials}</span><div><strong>{space.name}</strong><small>{space.owner} · {space.id}</small></div></div><span className="plan-pill">{space.plan}</span><div className="space-status-cell"><span className={`status ${space.status === "Activo" ? "success" : space.status === "Suspendido" ? "danger" : "neutral"}`}>{space.status}</span><button type="button" className={space.status === "Activo" ? "switch active" : "switch"} disabled={space.status !== "Activo" && space.status !== "Suspendido"} aria-label={space.status === "Activo" ? `Suspender ${space.name}` : `Activar ${space.name}`} onClick={() => toggleStatus(space)}><i /></button></div><div><strong>{space.storage}</strong><small>{space.users}/{space.maxUsers} usuarios · {space.portal}</small></div><div className="row-actions"><button type="button" className="icon-action-button lock" onClick={() => resetPassword(space)} aria-label={`Restablecer contraseña de ${space.owner}`} title="Restablecer contraseña"><AppIcon name="lock" /></button><button type="button" className="icon-action-button edit" onClick={() => setSelected(space)} aria-label={`Editar ${space.name}`} title="Editar"><AppIcon name="edit" /></button></div></div>)}
         </div>
       </section>
       {showWizard && <ProvisionWizard demoMode={demoMode} nextNumber={spaces.length + 1} onClose={() => setShowWizard(false)} onCreated={(space) => { setSpaces((current) => [...current, space]); setShowWizard(false); }} />}
