@@ -1,4 +1,4 @@
-# Nexo v1.2.3
+# Nexo v1.2.4
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -235,6 +235,11 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 
 - "Efectivo" ya se puede elegir como medio de pago en el carrito del portal (antes decía "Próximamente"); al elegirlo avisa que se coordina el pago por WhatsApp con la vendedora, igual que transferencia;
 - Mercado Pago y Tarjeta siguen como "Próximamente", porque esos sí necesitan conectar un servicio de pagos real.
+
+### Animaciones sutiles en el catálogo 1.2.4
+
+- las tarjetas de producto aparecen con un fundido suave, una detrás de otra, al cargar o filtrar el catálogo;
+- al pasar el mouse sobre una tarjeta, se levanta apenas con una sombra más marcada, y la foto hace un leve zoom — sin exagerar.
 
 ## Configuración
 

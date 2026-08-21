@@ -291,8 +291,11 @@ button { color: inherit; }
 .public-store-catalog-head h2 { margin:8px 0 0; font-size:28px; font-weight:500; }
 .public-store-catalog-head small { color:var(--muted); font:500 12px var(--font-geist-sans),Arial,sans-serif; }
 .public-store-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:22px; }
-.public-store-card { height:100%; border:1px solid #eee9e1; border-radius:16px; overflow:hidden; background:white; box-shadow:0 10px 28px rgba(30,40,37,.06); display:flex; flex-direction:column; }
-.public-store-thumb { height:170px; position:relative; display:grid; place-items:center; font-family:var(--font-geist-sans),Arial,sans-serif; }
+.public-store-card { height:100%; border:1px solid #eee9e1; border-radius:16px; overflow:hidden; background:white; box-shadow:0 10px 28px rgba(30,40,37,.06); display:flex; flex-direction:column; opacity:0; animation:store-card-in .45s ease forwards; transition:transform .25s ease,box-shadow .25s ease; }
+.public-store-card:hover { transform:translateY(-5px); box-shadow:0 18px 38px rgba(30,40,37,.14); }
+@keyframes store-card-in { from { opacity:0; } to { opacity:1; } }
+@media (prefers-reduced-motion:reduce) { .public-store-card { animation:none; opacity:1; } }
+.public-store-thumb { height:170px; position:relative; overflow:hidden; display:grid; place-items:center; font-family:var(--font-geist-sans),Arial,sans-serif; }
 .public-store-thumb span { font-size:38px; font-weight:700; color:white; opacity:.85; }
 .public-store-thumb small { position:absolute; left:10px; top:10px; padding:5px 8px; border-radius:8px; color:#8d5722; background:#fff2d7; font:700 10px var(--font-geist-sans),Arial,sans-serif; }
 .public-store-card.tone-0 .public-store-thumb { background:#e9a28e; }
@@ -447,7 +450,8 @@ button { color: inherit; }
 .public-store-hero-dots { position:absolute; z-index:1; left:0; right:0; bottom:20px; display:flex; justify-content:center; gap:8px; }
 .public-store-hero-dots button { width:9px; height:9px; padding:0; border:0; border-radius:50%; background:rgba(255,255,255,.55); cursor:pointer; }
 .public-store-hero-dots button.active { background:white; }
-.public-store-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.public-store-thumb img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .4s ease; }
+.public-store-card:hover .public-store-thumb img { transform:scale(1.07); }
 
 /* Nexo v0.4.2 · Ajustes: logo, banner y categorías */
 .settings-logo-upload { padding:0 22px 22px; }

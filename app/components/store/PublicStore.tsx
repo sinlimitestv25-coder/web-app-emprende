@@ -392,7 +392,7 @@ export function PublicStore({ slug }: { slug: string }) {
             const image = variant?.image || product.image;
             const outOfStock = stock <= 0;
             return (
-              <article key={product.id} className={`public-store-card tone-${index % 4}`}>
+              <article key={product.id} className={`public-store-card tone-${index % 4}`} style={{ animationDelay: `${Math.min(index, 10) * 0.04}s` }}>
                 <div className="public-store-thumb">
                   {image ? <img src={image} alt={product.name} /> : <span>{product.category.slice(0, 1)}</span>}
                   {!outOfStock && stock <= minStock && <small>Últimas {stock}</small>}
