@@ -33,6 +33,7 @@ const shapes: Record<string, ReactNode> = {
   gridSmall: <><rect x="3" y="3.5" width="5" height="5" rx="1" /><rect x="9.5" y="3.5" width="5" height="5" rx="1" /><rect x="16" y="3.5" width="5" height="5" rx="1" /><rect x="3" y="10" width="5" height="5" rx="1" /><rect x="9.5" y="10" width="5" height="5" rx="1" /><rect x="16" y="10" width="5" height="5" rx="1" /><rect x="3" y="16.5" width="5" height="5" rx="1" /><rect x="9.5" y="16.5" width="5" height="5" rx="1" /><rect x="16" y="16.5" width="5" height="5" rx="1" /></>,
   list: <><path d="M4 6.5h4M11 6.5h9" /><path d="M4 12h4M11 12h9" /><path d="M4 17.5h4M11 17.5h9" /></>,
   cart: <><path d="M2.5 4h2.5l2 11h11.5" /><path d="M6 7h14l-1.8 7H8.3Z" /><circle cx="9.5" cy="19.3" r="1.4" fill="currentColor" stroke="none" /><circle cx="16.5" cy="19.3" r="1.4" fill="currentColor" stroke="none" /></>,
+  lock: <><rect x="5" y="10.5" width="14" height="10" rx="2" /><path d="M8 10.5V8h8v2.5" /><circle cx="12" cy="15" r="1.3" fill="currentColor" stroke="none" /></>,
 };
 
 export function AppIcon({ name, className = "", label }: { name: string; className?: string; label?: string }) {

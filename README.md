@@ -1,4 +1,4 @@
-# Nexo v1.2.6
+# Nexo v1.3.0
 
 SaaS multitenant para administrar emprendimientos. Esta versión mantiene separada la superadministración e incorpora una demostración funcional del panel privado de Luna Creativa.
 
@@ -250,6 +250,12 @@ Desde la pantalla de acceso se puede elegir entre la demostración del emprendim
 ### Corrección de posición en el login 1.2.6
 
 - corregido: el texto "PLATAFORMA MULTITENANT / Administrá el crecimiento" había bajado en vez de subir en la entrega anterior (un margen mal calculado); ahora sí queda cerca del logo y del eslogan, arriba del panel.
+
+### Espacios: interruptor, editar y eliminar 1.3.0
+
+- en la tabla de Espacios (superadministración), el estado Activo/Suspendido ahora tiene un interruptor para cambiarlo con un clic, sin entrar al detalle;
+- el botón de la fila pasó de "Administrar" a "Editar";
+- dentro del detalle de cada espacio: "Restablecer contraseña" (antes decía "Restablecer acceso" y no hacía nada — ahora al menos confirma la acción), "Editar" (nuevo: nombre, plan y máximo de usuarios), Suspender/Reactivar, Archivar, y "Eliminar espacio" (nuevo, definitivo, pide confirmación antes de borrar).
 
 ## Configuración
 
